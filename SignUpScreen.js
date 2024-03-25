@@ -27,6 +27,7 @@ const SignUpScreen = ({ navigation }) => {
   return (
     <View style={[styles.container, { backgroundColor: logoBeige }]}>
       <Image source={require('./assets/logo.png')} style={styles.logo} />
+      <Image source={require('./assets/logo.png')} style={styles.logo} />
       <Text style={[styles.welcomeText, { color: logoBrown }]}>Welcome to Swell!</Text>
       <Text style={styles.descriptionText}>A mind and body app dedicated to helping you become so well.</Text>
       <Image source={require('./assets/welcome.png')} style={styles.logo2} />
