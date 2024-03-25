@@ -18,7 +18,7 @@ const AgeGenderScreen = ({ navigation, route }) => {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Image 
-        source={require('./logo.png')}
+        source={require('./assets/logo.png')}
         style={styles.image}
       />
       <Text style={styles.questionText}>What's your age?</Text>
