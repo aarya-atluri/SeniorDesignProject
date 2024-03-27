@@ -28,7 +28,7 @@ const SignUpDetailsScreen = ({ navigation }) => {
     >
       {/* Image component added here */}
       <Image
-        source={require('./Account.png')}
+        source={require('./assets/Account.png')}
         style={styles.logo}
         resizeMode="contain"
       />
