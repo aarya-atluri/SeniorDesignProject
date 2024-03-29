@@ -35,7 +35,7 @@ const HomeScreen = ({ navigation }) => {
               />
               <Text style={styles.bodyText}>365</Text>
               <Image
-                source={require('./assets/images/happy.jpg')}
+                source={require('./assets/images/happy-icon.svg')}
                 style={styles.icon}
               />
               <Text style={styles.bodyText}>Happy</Text>
@@ -48,51 +48,124 @@ const HomeScreen = ({ navigation }) => {
           style={styles.greenButton}
           onPress={() => navigation.navigate('Journal')}
         >
-          <Text style={styles.buttonText}>+</Text>
+          <Image
+            source={require('./assets/checkin.svg')}
+            style={[styles.greenButton, { width: 100, height: 100 }]}
+          />
       </TouchableOpacity>
 
-      <Text style={styles.titleText}>Daily Check-in</Text>
-      <TouchableOpacity
-          style={styles.checkin}
-          onPress={handleDayPress}
-        >
-          <Text style={styles.buttonText}>You checked in 1 time today!</Text>
-        </TouchableOpacity>
+      <View style={styles.dailyContainer}>
+          <Text style={styles.titleText}>Daily Check-in</Text>
+        <TouchableOpacity
+            style={styles.checkin}
+            onPress={handleDayPress}
+          >
+            <View style={styles.buttonContent}>
+              <View style={styles.buttonTextContainer}>
+                <Text style={styles.buttonText}>You checked in 1 time today!</Text>
+                <Text style={styles.buttonText}>Your mood was: Happy</Text>
+              </View>
+              <Image
+                source={require('./assets/images/happy-icon.svg')}
+                style={[styles.icon, { width: 70, height: 70}]}
+              />
+            </View> 
+            
+          </TouchableOpacity>
+      
 
-      {/* Buttons List */}
-      <ScrollView style={styles.buttonsContainer}>
-        <TouchableOpacity
-          style={styles.buttonTracker}
-          onPress={() => navigation.navigate('Journal')}
-        >
-          <Text style={styles.buttonText}>Mindful Journal</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.buttonTracker}
-          onPress={() => navigation.navigate('Journal')}
-        >
-          <Text style={styles.buttonText}>Mood Tracker</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.buttonTracker}
-          onPress={() => navigation.navigate('Journal')}
-        >
-          <Text style={styles.buttonText}>Sleep Tracker</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.buttonTracker}
-          onPress={() => navigation.navigate('Journal')}
-        >
-          <Text style={styles.buttonText}>Physical Activity</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.buttonTracker}
-          onPress={() => navigation.navigate('Journal')}
-        >
-          <Text style={styles.buttonText}>Social Interaction</Text>
-        </TouchableOpacity>
-      </ScrollView>
-    </View>
+        <Text style={styles.titleText}>Daily Trackers</Text>
+      </View>
+
+        {/* Buttons List */}
+        <ScrollView style={styles.buttonsContainer}>
+          {/* Journal*/}
+            <TouchableOpacity
+              style={styles.buttonTracker}
+              onPress={() => navigation.navigate('Journal')}
+            >
+            <View style={styles.buttonContent}>
+              <Image
+                source={require('./assets/journal.svg')}
+                style={styles.icon}
+              />
+              <View style={styles.buttonTextContainer}>
+              <Text style={styles.buttonText}>Mindful Journal</Text>
+              <Text style={styles.trackerDescription}>5 entries this week</Text>
+              </View>
+            </View> 
+            </TouchableOpacity>
+
+            {/* Mood*/}
+            <TouchableOpacity
+              style={styles.buttonTracker}
+              onPress={() => navigation.navigate('Journal')}
+            >
+            <View style={styles.buttonContent}>
+              <Image
+                source={require('./assets/mood-tracker.svg')}
+                style={styles.icon}
+              />
+              <View style={styles.buttonTextContainer}>
+              <Text style={styles.buttonText}>Mood Tracker</Text>
+              <Text style={styles.trackerDescription}>Week average: happy</Text>
+              </View>
+            </View> 
+            </TouchableOpacity>
+
+            {/* Sleep*/}
+            <TouchableOpacity
+              style={styles.buttonTracker}
+              onPress={() => navigation.navigate('Journal')}
+            >
+            <View style={styles.buttonContent}>
+              <Image
+                source={require('./assets/sleep-tracker.svg')}
+                style={styles.icon}
+              />
+              <View style={styles.buttonTextContainer}>
+              <Text style={styles.buttonText}>Sleep</Text>
+              <Text style={styles.trackerDescription}>5hr and 29min</Text>
+              </View>
+            </View> 
+            </TouchableOpacity>
+
+            {/* Physical */}
+            <TouchableOpacity
+              style={styles.buttonTracker}
+              onPress={() => navigation.navigate('Journal')}
+            >
+            <View style={styles.buttonContent}>
+              <Image
+                source={require('./assets/physical-activity.svg')}
+                style={styles.icon}
+              />
+              <View style={styles.buttonTextContainer}>
+              <Text style={styles.buttonText}>Physical Activity</Text>
+              <Text style={styles.trackerDescription}>37 minutes</Text>
+              </View>
+            </View> 
+            </TouchableOpacity>
+
+            {/* Social */}
+            <TouchableOpacity
+              style={styles.buttonTracker}
+              onPress={() => navigation.navigate('Journal')}
+            >
+            <View style={styles.buttonContent}>
+              <Image
+                source={require('./assets/social-interaction.svg')}
+                style={styles.icon}
+              />
+              <View style={styles.buttonTextContainer}>
+              <Text style={styles.buttonText}>Social Interaction</Text>
+              <Text style={styles.trackerDescription}>1hr and 26min</Text>
+              </View>
+            </View> 
+            </TouchableOpacity>
+          </ScrollView>
+      </View>
+    
   );
 };
 
@@ -104,10 +177,11 @@ const styles = StyleSheet.create({
   },
   welcomeBar: {
     width: '100%',
+    height: 160,
     backgroundColor: '#4B3425',
     paddingVertical: 20,
     paddingHorizontal: 20,
-    marginBottom: 20,
+    marginBottom: 0,
     borderTopLeftRadius: 0,
     borderTopRightRadius: 0,
     borderBottomLeftRadius: 15,
@@ -118,6 +192,7 @@ const styles = StyleSheet.create({
     color: '#FFF',
     fontSize: 14,
     marginBottom: 10,
+    left: -27,
   },
   profileContainer: {
     flexDirection: 'row',
@@ -140,14 +215,19 @@ const styles = StyleSheet.create({
     color: '#fff',
     textAlign: 'center',
   },
+  dailyContainer: {
+    width: '90%',
+    top: -40,
+  },
   buttonsContainer: {
     width: '100%',
+    top: - 40
   },
   buttonTracker: {
     backgroundColor: '#fff',
-    paddingHorizontal: 20,
-    paddingVertical: 28,
-    borderRadius: 15,
+    paddingHorizontal: 15,
+    paddingVertical: 15,
+    borderRadius: 31,
     marginBottom: 10,
     width: '90%',
     alignSelf: 'center',
@@ -155,17 +235,18 @@ const styles = StyleSheet.create({
   checkin: {
     backgroundColor: '#FFEBC2',
     paddingHorizontal: 20,
-    paddingVertical: 28,
+    paddingVertical: 20,
     borderRadius: 15,
     marginBottom: 10,
-    width: '90%',
+    width: '100%',
     alignSelf: 'center',
   },
   buttonText: {
     color: '#6D4B36',
     fontSize: 16,
+    marginleft: 30,
     fontWeight: 'bold',
-    textAlign: 'center',
+    textAlign: 'left',
   },
   profileImage: {
     width: 50,
@@ -178,26 +259,42 @@ const styles = StyleSheet.create({
   iconContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    left: -25,
   },
   icon: {
     marginRight: 4,
     marginLeft: 5,
+    marginTop: 5,
   },
   greenButton: {
-    backgroundColor: '#9BB068',
-    width: 50,
-    height: 50,
-    borderRadius: 25,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 10,
+    top: -23,
   },
   titleText: {
     fontSize: 14,
     fontWeight: 'bold',
     color:'#6D4B36',
+    marginTop: 10,
     marginBottom: 10,
-    textAlign: 'left'
+    textAlign: 'left',
+    alignSelf: 'flex-start', 
+  },
+  trackerDescription: {
+    color: '#878E96',
+    fontSize: 14,
+    fontWeight: 'semibold',
+    textAlign: 'left',
+  },
+  buttonContent: {
+    flexDirection: 'row',
+    alignItems: 'left',
+  },
+  buttonTextContainer: {
+    alignContent: 'left',
+    marginLeft: 18,
+    justifyContent: 'center',
+    flex: 1, 
   },
 });
 

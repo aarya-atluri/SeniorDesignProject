@@ -40,8 +40,9 @@ const AuthStackNavigator = () => (
 );
 
 const MainApp = () => (
-  <Tab.Navigator
+<Tab.Navigator
     screenOptions={({ route }) => ({
+      headerShown: false, 
       tabBarIcon: ({ focused, color, size }) => {
         let iconName;
         if (route.name === 'Home') {
