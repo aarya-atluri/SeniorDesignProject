@@ -4,14 +4,13 @@ import { getFirestore } from 'firebase/firestore';
 
 // Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyAck7dO2IktKeLtssoCXCp1nX6nSpp0ky4",
-  authDomain: "senior-design-project-bb885.firebaseapp.com",
-  databaseURL: "https://senior-design-project-bb885-default-rtdb.firebaseio.com/",
-  projectId: "senior-design-project-bb885",
-  storageBucket: "senior-design-project-bb885.appspot.com",
-  messagingSenderId: "1011357809155",
-  appId: "1:1011357809155:web:6be061ab4c2f89a2a12c36",
-  measurementId: "G-ML88BBXMXB"
+  apiKey: "AIzaSyCq_mffvRoYH11BZjk2hDHYODYzgErbTZY",
+  authDomain: "seniordesign-e83c6.firebaseapp.com",
+  projectId: "seniordesign-e83c6",
+  storageBucket: "seniordesign-e83c6.appspot.com",
+  messagingSenderId: "889627653285",
+  appId: "1:889627653285:web:077829d1fb91931faa094c",
+  measurementId: "G-XHB3YS9Z7E"
 };
 
 // Initialize Firebase
@@ -23,4 +22,7 @@ const auth = getAuth(app);
 // Initialize Cloud Firestore and get a reference to the service
 const db = getFirestore(app);
 
-export { auth, db };
+// Initialize Firebase Storage and get a reference to the service
+const storage = getStorage(app)
+
+export { auth, db, storage };
