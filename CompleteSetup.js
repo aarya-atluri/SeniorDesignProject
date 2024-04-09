@@ -1,44 +1,13 @@
 import React, { useContext } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
-import { AuthContext } from './App'; // Import AuthContext from the file App.js is in
-import { auth, db } from './Firebase/firebaseConfig'; // Update the path if necessary
+import { AuthContext } from './App';
+import { auth } from './Firebase/firebaseConfig'; // Make sure this path matches your project structure
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore';
-
-
 
 const CompleteSetup = ({ route }) => {
-  // Retrieve user details and context from route and AuthContext
   const { username, password, name, age, gender } = route.params;
   const { setIsSignedIn } = useContext(AuthContext);
 
-  const handleSwell = () => {
-    // Sign up user with Firebase Authentication
-    createUserWithEmailAndPassword(auth, username, password)
-      .then((userCredential) => {
-        // Signed in 
-        const user = userCredential.user;
-  
-        // Add additional user information to Firestore
-        return setDoc(doc(db, "users", user.uid), {
-          name: name,
-          age: age,
-          gender: gender,
-        });
-      })
-      .then(() => {
-        // Data saved successfully in Firestore, update the signed-in state
-        //setIsSignedIn(true);
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        // Handle errors
-        console.error("Error signing up in Firebase Authentication: ", errorMessage);
-        // Update the UI to show the error message, if necessary
-      });
-      setIsSignedIn(true);
-  };
   
 
   return (
@@ -50,7 +19,16 @@ const CompleteSetup = ({ route }) => {
       />
       <Text style={styles.welcomeText}>Welcome </Text>
       <Text style={[styles.nameText, { color: 'darkviolet' }]}>{name}</Text>
-      <TouchableOpacity style={styles.swellButton} onPress={handleSwell}>
+      <TouchableOpacity style={styles.swellButton} onPress={() => 
+        createUserWithEmailAndPassword(auth, username, password)
+        .then((userCredential) => {
+          // User is signed in, userCredential contains the user info
+          const user = userCredential.user;
+          
+          setIsSignedIn(true);
+        })
+        
+        }>
         <Text style={styles.buttonText}>On to Swell!</Text>
       </TouchableOpacity>
     </View>

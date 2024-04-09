@@ -1,7 +1,12 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { auth } from './Firebase/firebaseConfig'; // Make sure this path matches your project structure
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { AuthContext } from './App';
+
 
 const SignUpScreen = ({ navigation }) => {
+  
   const handleSignUpWithGoogle = () => {
     // Handle sign-up with Google logic here
   };
@@ -20,8 +25,8 @@ const SignUpScreen = ({ navigation }) => {
       <Text style={[styles.welcomeText, { color: logoBrown }]}>Welcome to Swell!</Text>
       <Text style={styles.descriptionText}>A mind and body app dedicated to helping you become so well.</Text>
       <Image source={require('./assets/welcome.png')} style={styles.logo2} />
-      <TouchableOpacity style={styles.buttonGoogle} onPress={handleSignUpWithGoogle}>
-        <Text style={styles.buttonText}>Sign up with Google</Text>
+      <TouchableOpacity style={styles.buttonGoogle} onPress={() => signInWithEmailAndPassword(auth, 'test@gmail.com', 'password')}>
+        <Text style={styles.buttonText}>Sign In</Text>
       </TouchableOpacity>
       <Text style={styles.orText}>— OR —</Text>
       <TouchableOpacity style={styles.customSignUpButton} onPress={goToSignUpDetails}>
