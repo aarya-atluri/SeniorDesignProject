@@ -7,13 +7,14 @@ import { getStorage } from 'firebase/storage';
 const firebaseConfig = {
   apiKey: "AIzaSyCq_mffvRoYH11BZjk2hDHYODYzgErbTZY",
   authDomain: "seniordesign-e83c6.firebaseapp.com",
+  databaseURL: "https://seniordesign-e83c6-default-rtdb.firebaseio.com",
   projectId: "seniordesign-e83c6",
   storageBucket: "seniordesign-e83c6.appspot.com",
   messagingSenderId: "889627653285",
   appId: "1:889627653285:web:077829d1fb91931faa094c",
   measurementId: "G-XHB3YS9Z7E"
 };
-
+s
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
