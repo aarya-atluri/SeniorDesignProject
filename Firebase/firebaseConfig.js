@@ -27,4 +27,4 @@ const db = getFirestore(app);
 // Initialize Firebase Storage and get a reference to the service
 const storage = getStorage(app)
 
-export { auth, db, storage };
+export { auth, db, storage, usersRef};
