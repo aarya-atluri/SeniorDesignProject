@@ -1,10 +1,3 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Button, Alert } from 'react-native';
-import { sendPasswordResetEmail } from 'firebase/auth';
-import { auth } from './Firebase/firebaseConfig';
-
-import { user } from './CompleteSetup';
-
 import React from 'react';
 import { View, Text, StyleSheet, Button, Alert } from 'react-native';
 import { sendPasswordResetEmail } from 'firebase/auth';
