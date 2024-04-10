@@ -1,10 +1,3 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Button, Alert } from 'react-native';
-import { sendPasswordResetEmail } from 'firebase/auth';
-import { auth } from './Firebase/firebaseConfig';
-
-import { user } from './CompleteSetup';
-
 import React from 'react';
 import { View, Text, StyleSheet, Button, Alert } from 'react-native';
 import { sendPasswordResetEmail } from 'firebase/auth';
@@ -13,10 +6,9 @@ import { auth } from './Firebase/firebaseConfig';
 import { user } from './CompleteSetup';
 
 const ProfileScreen = () => {
-  const [userData, setUserData] = useState(null);
 
   const handlePasswordReset = () => {
-    sendPasswordResetEmail(auth, userData.email)
+    sendPasswordResetEmail(auth, user.email)
       .then(() => {
         Alert.alert("Check your email", "A password reset link has been sent to your email.");
       })
@@ -26,31 +18,13 @@ const ProfileScreen = () => {
       });
   };
 
-  const fetchUserData = async () => {
-    try {
-      const docRef = doc(db, 'users', auth.currentUser?.uid);
-      const docSnap = await getDoc(docRef);
-      if (docSnap.exists()) {
-        setUserData(docSnap.data());
-      } else {
-        console.log('No such document!');
-      }
-    } catch (error) {
-      console.error('Error getting document:', error);
-    }
-  };
-
-  useEffect(() => {
-    fetchUserData();
-  }, []);
-
   return (
     <View style={styles.container}>
       <Text style={styles.header}>User Profile</Text>
-      <Text style={styles.infoLabel}>Email: {userData ? userData.email : 'linmadi61@gmail.com'}</Text>
-      <Text style={styles.infoLabel}>Name: {userData ? userData.name: 'Lindsey'}</Text>
-      <Text style={styles.infoLabel}>Age: {userData ? userData.age: 21}</Text>
-      <Text style={styles.infoLabel}>Gender: {userData ? userData.gender: 'female'}</Text>
+      <Text style={styles.infoLabel}>Email: {user.email}</Text>
+      <Text style={styles.infoLabel}>Name: {user.name}</Text>
+      <Text style={styles.infoLabel}>Age: {user.age}</Text>
+      <Text style={styles.infoLabel}>Gender: {user.gender}</Text>
 
       <Button
         title="Send Password Reset Email"
@@ -65,10 +39,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    alignItems: 'center',
     justifyContent: 'center',
-    padding: 20,
-    backgroundColor: '#fff',
     padding: 20,
     backgroundColor: '#fff'
   },
@@ -88,3 +59,4 @@ const styles = StyleSheet.create({
 });
 
 export default ProfileScreen;
+
