@@ -38,7 +38,7 @@ const SignUpDetailsScreen = ({ navigation }) => {
           style={styles.input}
           onChangeText={setUsername}
           value={username}
-          placeholder="Username"
+          placeholder="Email"
           autoCapitalize="none"
         />
         <TextInput

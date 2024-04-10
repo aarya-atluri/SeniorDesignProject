@@ -1,12 +1,96 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
+import { auth, db } from './Firebase/firebaseConfig';
+import { doc, getDoc } from 'firebase/firestore';
+import { User } from 'firebase/auth';
+import { fetchJournalCount,  fetchJournalEntries, fetchLastMood, getButtonColorFromMood, fetchTodayTotal} from './JournalUtils';
+import MoodImage from './Mood'
 
 const HomeScreen = ({ navigation }) => {
+  const [userData, setUserData] = useState(null);
+  const [journalCount, setJournalCount] = useState(0);
+  const [lastMood, setLastMood] = useState('');
+  const [checkinButtonColor, setCheckinButtonColor] = useState('#FFEBC2');
+  const [streak, setStreak] = useState(0);
+  const [sleepHoursTotal, setSleepHoursTotal] = useState('');
+  const [sleepMinsTotal, setSleepMinsTotal] = useState('');
+  const [physicalActivityHoursTotal, setPhysicalActivityHoursTotal] = useState('');
+  const [physicalActivityMinsTotal, setPhysicalActivityMinsTotal] = useState('');
+  const [caffeineTotal, setCaffeineTotal] = useState('');
+  const [waterIntakeTotal, setWaterIntakeTotal] = useState('');
+
   // Function to get the local date
   const getLocalDate = () => {
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     return new Date().toLocaleDateString(undefined, options);
   };
+
+  // Function to calculate streak based on journal entries
+  const calculateStreak = (journalEntries) => {
+    const today = new Date().toISOString().split('T')[0];
+    const sortedEntries = journalEntries.sort((a, b) => {
+      return new Date(a.date) - new Date(b.date);
+    });
+
+    let streak = 0;
+    let currentDate = today;
+
+    for (let i = sortedEntries.length - 1; i >= 0; i--) {
+      const entryDate = sortedEntries[i].date;
+
+      if (entryDate === currentDate) {
+        streak++;
+        currentDate = decrementDate(currentDate);
+      } else {
+        break;
+      }
+    }
+
+    return streak;
+  };
+
+  const decrementDate = (date) => {
+    const currentDate = new Date(date);
+    currentDate.setDate(currentDate.getDate() - 1);
+    return currentDate.toISOString().split('T')[0];
+  };
+
+
+  const fetchUserData = async () => {
+    try {
+      const docRef = doc(db, 'users', auth.currentUser?.uid);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        setUserData(docSnap.data());
+      } else {
+        console.log('No such document!');
+      }
+    } catch (error) {
+      console.error('Error getting document:', error);
+    }
+  };
+
+
+  // when component mounts
+  useEffect(() => {
+    fetchUserData();
+    fetchJournalCount(auth.currentUser?.uid, new Date().toISOString().split('T')[0]).then(count => setJournalCount(count));
+    fetchLastMood(auth.currentUser?.uid).then(mood => setLastMood(mood));
+    fetchJournalEntries(auth.currentUser?.uid).then(entries => {
+      const calculatedStreak = calculateStreak(entries);
+      setStreak(calculatedStreak);
+    });
+    const color = getButtonColorFromMood(lastMood);
+    setCheckinButtonColor(color);
+    fetchTodayTotal(auth.currentUser?.uid).then(totals => {
+      setSleepHoursTotal(totals.sleepHoursTotal);
+      setSleepMinsTotal(totals.sleepMinsTotal);
+      setPhysicalActivityMinsTotal(totals.physicalActivityMinsTotal);
+      setPhysicalActivityHoursTotal(totals.physicalActivityHoursTotal);
+      setCaffeineTotal(totals.caffeineTotal);
+      setWaterIntakeTotal(totals.waterIntakeTotal);
+    });
+  }, []);
 
   const handleDayPress = (day) => {
     // Navigate to a different screen upon pressing a specific date
@@ -27,18 +111,15 @@ const HomeScreen = ({ navigation }) => {
             style={styles.profileImage}
           />
           <View style={styles.welcomeTextContainer}>
-            <Text style={styles.welcomeText}>Hi, Thomaz!</Text>
+            <Text style={styles.welcomeText}>Hi, {userData ? userData.name : 'User'}!</Text>
             <View style={styles.iconContainer}>
               <Image
                 source={require('./assets/fire-icon.svg')}
                 style={styles.icon}
               />
-              <Text style={styles.bodyText}>365</Text>
-              <Image
-                source={require('./assets/images/happy-icon.svg')}
-                style={styles.icon}
-              />
-              <Text style={styles.bodyText}>Happy</Text>
+              <Text style={styles.bodyText}>{streak}</Text>
+              <MoodImage mood={lastMood ? lastMood : 'Unknown'} />
+              <Text style={styles.bodyText}>{lastMood ? lastMood : 'Unknown'}</Text>
             </View>
           </View>
         </View>
@@ -57,17 +138,17 @@ const HomeScreen = ({ navigation }) => {
       <View style={styles.dailyContainer}>
           <Text style={styles.titleText}>Daily Check-in</Text>
         <TouchableOpacity
-            style={styles.checkin}
+            style={[styles.checkin, { backgroundColor: checkinButtonColor }]}
             onPress={handleDayPress}
           >
             <View style={styles.buttonContent}>
               <View style={styles.buttonTextContainer}>
-                <Text style={styles.buttonText}>You checked in 1 time today!</Text>
-                <Text style={styles.buttonText}>Your mood was: Happy</Text>
+                <Text style={styles.buttonText}>You checked in {journalCount ? journalCount: 0} times today!</Text>
+                <Text style={styles.buttonText}>Your mood was: {lastMood ? lastMood : 'Unknown'}</Text>
               </View>
-              <Image
-                source={require('./assets/images/happy-icon.svg')}
-                style={[styles.icon, { width: 70, height: 70}]}
+              <MoodImage
+                mood={lastMood ? lastMood : 'Unknown'} 
+                style={{ width: 70, height: 70}}
               />
             </View> 
             
@@ -77,46 +158,27 @@ const HomeScreen = ({ navigation }) => {
         <Text style={styles.titleText}>Daily Trackers</Text>
       </View>
 
-        {/* Buttons List */}
+        {/* Daily Trackers List */}
         <ScrollView style={styles.buttonsContainer}>
-          {/* Journal*/}
-            <TouchableOpacity
+          {/* Screen Time*/}
+            <View
               style={styles.buttonTracker}
-              onPress={() => navigation.navigate('Journal')}
             >
             <View style={styles.buttonContent}>
               <Image
-                source={require('./assets/journal.svg')}
+                source={require('./assets/screen-tracker.svg')}
                 style={styles.icon}
               />
               <View style={styles.buttonTextContainer}>
-              <Text style={styles.buttonText}>Mindful Journal</Text>
-              <Text style={styles.trackerDescription}>5 entries this week</Text>
+              <Text style={styles.buttonText}>Screen Time</Text>
+              <Text style={styles.trackerDescription}>5hrs</Text>
               </View>
             </View> 
-            </TouchableOpacity>
-
-            {/* Mood*/}
-            <TouchableOpacity
-              style={styles.buttonTracker}
-              onPress={() => navigation.navigate('Journal')}
-            >
-            <View style={styles.buttonContent}>
-              <Image
-                source={require('./assets/mood-tracker.svg')}
-                style={styles.icon}
-              />
-              <View style={styles.buttonTextContainer}>
-              <Text style={styles.buttonText}>Mood Tracker</Text>
-              <Text style={styles.trackerDescription}>Week average: happy</Text>
-              </View>
-            </View> 
-            </TouchableOpacity>
+            </View>
 
             {/* Sleep*/}
-            <TouchableOpacity
+            <View
               style={styles.buttonTracker}
-              onPress={() => navigation.navigate('Journal')}
             >
             <View style={styles.buttonContent}>
               <Image
@@ -125,15 +187,14 @@ const HomeScreen = ({ navigation }) => {
               />
               <View style={styles.buttonTextContainer}>
               <Text style={styles.buttonText}>Sleep</Text>
-              <Text style={styles.trackerDescription}>5hr and 29min</Text>
+              <Text style={styles.trackerDescription}>{sleepHoursTotal} {sleepHoursTotal === 1 ? 'hour' : 'hours'} and {sleepMinsTotal} {sleepMinsTotal === 1 ? 'minute' : 'minutes'}</Text>
               </View>
             </View> 
-            </TouchableOpacity>
+            </View>
 
             {/* Physical */}
-            <TouchableOpacity
+            <View
               style={styles.buttonTracker}
-              onPress={() => navigation.navigate('Journal')}
             >
             <View style={styles.buttonContent}>
               <Image
@@ -142,15 +203,14 @@ const HomeScreen = ({ navigation }) => {
               />
               <View style={styles.buttonTextContainer}>
               <Text style={styles.buttonText}>Physical Activity</Text>
-              <Text style={styles.trackerDescription}>37 minutes</Text>
+              <Text style={styles.trackerDescription}>{physicalActivityHoursTotal} {physicalActivityHoursTotal === 1 ? 'hour' : 'hours'} and {physicalActivityMinsTotal} {physicalActivityMinsTotal === 1 ? 'minute' : 'minutes'}</Text>
               </View>
             </View> 
-            </TouchableOpacity>
+            </View>
 
             {/* Social */}
-            <TouchableOpacity
+            <View
               style={styles.buttonTracker}
-              onPress={() => navigation.navigate('Journal')}
             >
             <View style={styles.buttonContent}>
               <Image
@@ -162,7 +222,39 @@ const HomeScreen = ({ navigation }) => {
               <Text style={styles.trackerDescription}>1hr and 26min</Text>
               </View>
             </View> 
-            </TouchableOpacity>
+            </View>
+
+            {/* Caffeine Consumption */}
+            <View
+              style={styles.buttonTracker}
+            >
+            <View style={styles.buttonContent}>
+              <Image
+                source={require('./assets/caffeine-tracker.svg')}
+                style={styles.icon}
+              />
+              <View style={styles.buttonTextContainer}>
+              <Text style={styles.buttonText}>Caffeine Consumption</Text>
+              <Text style={styles.trackerDescription}>{caffeineTotal}mg</Text>
+              </View>
+            </View> 
+            </View>
+
+            {/* Water Intake */}
+            <View
+              style={styles.buttonTracker}
+            >
+            <View style={styles.buttonContent}>
+              <Image
+                source={require('./assets/water-tracker.svg')}
+                style={styles.icon}
+              />
+              <View style={styles.buttonTextContainer}>
+              <Text style={styles.buttonText}>Water Intake</Text>
+              <Text style={styles.trackerDescription}>{waterIntakeTotal} cups</Text>
+              </View>
+            </View> 
+            </View>
           </ScrollView>
       </View>
     
@@ -233,7 +325,6 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   checkin: {
-    backgroundColor: '#FFEBC2',
     paddingHorizontal: 20,
     paddingVertical: 20,
     borderRadius: 15,

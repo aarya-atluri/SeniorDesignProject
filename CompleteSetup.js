@@ -1,45 +1,48 @@
 import React, { useContext } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
-import { AuthContext } from './App'; // Import AuthContext from the file App.js is in
-import { auth, db } from './Firebase/firebaseConfig'; // Update the path if necessary
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore';
-
-
+import { AuthContext } from './App';
+import { auth, db } from './Firebase/firebaseConfig'; // Make sure this path matches your project structure
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import { doc, setDoc, collection, addDoc} from 'firebase/firestore';
 
 const CompleteSetup = ({ route }) => {
-  // Retrieve user details and context from route and AuthContext
   const { username, password, name, age, gender } = route.params;
   const { setIsSignedIn } = useContext(AuthContext);
 
-  const handleSwell = () => {
-    // Sign up user with Firebase Authentication
-    createUserWithEmailAndPassword(auth, username, password)
-      .then((userCredential) => {
-        // Signed in 
-        const user = userCredential.user;
-  
-        // Add additional user information to Firestore
-        return setDoc(doc(db, "users", user.uid), {
-          name: name,
-          age: age,
-          gender: gender,
-        });
-      })
-      .then(() => {
-        // Data saved successfully in Firestore, update the signed-in state
-        //setIsSignedIn(true);
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        // Handle errors
-        console.error("Error signing up in Firebase Authentication: ", errorMessage);
-        // Update the UI to show the error message, if necessary
+  const handleSignUp = async () => {
+    try {
+       const userCredential = await createUserWithEmailAndPassword(auth, username, password);
+      //const userCredential = await signInWithEmailAndPassword(auth, username, password);
+      const user = userCredential.user;
+
+      const userRef = doc(db, 'users', auth.currentUser.uid);
+      // const journalEntriesRef = collection(userRef, 'journal_entries');
+
+      // const defaultEntry = {
+      //   date: "", 
+      //   text: "",
+      //   mood: "Meh" 
+      // };
+
+      // Add user data to Firestore collection
+      await setDoc(userRef,{
+          email: username,
+          name,
+          gender,
+          age,
+          profile_pic: "",
+          // journalEntriesRef: [defaultEntry]
       });
+
+
+      console.log("User added with ID: ", userRef.id);
+
       setIsSignedIn(true);
+    } catch (error) {
+      console.error('Error creating user:', error);
+      // Handle error
+    }
   };
-  
 
   return (
     <View style={styles.container}>
@@ -50,7 +53,7 @@ const CompleteSetup = ({ route }) => {
       />
       <Text style={styles.welcomeText}>Welcome </Text>
       <Text style={[styles.nameText, { color: 'darkviolet' }]}>{name}</Text>
-      <TouchableOpacity style={styles.swellButton} onPress={handleSwell}>
+      <TouchableOpacity style={styles.swellButton} onPress={handleSignUp}>
         <Text style={styles.buttonText}>On to Swell!</Text>
       </TouchableOpacity>
     </View>
