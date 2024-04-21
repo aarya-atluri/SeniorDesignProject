@@ -1,16 +1,83 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'; // Import TouchableOpacity
 import { Calendar } from 'react-native-calendars';
 import { useNavigation } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
+import {auth, db} from './Firebase/firebaseConfig'
+import {collection, query, where, doc, getDoc} from 'firebase/firestore'
 
-const CalendarScreen = ({ route }) => {
-  const { userInput } = route.params;
+
+const CalendarScreen = ({}) => {
   const [currentMonth, setCurrentMonth] = useState(new Date().toISOString().slice(0, 7));
+  const [markedDates, setMarkedDates] = useState({});
   const navigation = useNavigation(); // Initialize navigation
 
-  const handleDayPress = (day) => {
+  const handleDayPress = async (day) => {
     // Navigate to a different screen upon pressing a specific date
-    navigation.navigate('SpecificEntry', { selectedDate: day });
+    const selectedDate = day.dateString;
+  
+  // Check if there are entries for the selected date
+    try {
+    const moodRef = collection(db, 'journal_entries');
+    const q = query(moodRef, where('date', '==', selectedDate));
+    const querySnapshot = await getDoc(q);
+    
+    if (querySnapshot.size > 0) {
+      navigation.navigate('SpecificEntry', { selectedDate });
+    } else {
+      // Handle case where there are no entries for the selected date
+      console.log('No entries found for the selected date.');
+    }
+  } catch (error) {
+    console.error('Error fetching entries:', error);
+  }
+  };
+
+  const onPressHandler =() => {
+    navigation.navigate('Journal')
+  };
+
+
+  useEffect(() => {
+    const fetchMoods = async () => {
+      try {
+        const moodRef = collection(db, 'journal_entries');
+        const querySnapshot = await getDoc(moodRef);
+        
+        const markedDatesObject = {};
+
+        querySnapshot.forEach(doc => {
+          const data = doc.data();
+          const date = data.date;
+          const mood = data.mood;
+
+          markedDatesObject[date] = { selected: true, selectedColor: getMoodColor(mood) };
+        });
+
+        setMarkedDates(markedDatesObject);
+      } catch (error) {
+        console.error('Error fetching moods:', error);
+      }
+    };
+
+    fetchMoods();
+  }, []);
+
+  const getMoodColor = (mood) => {
+    switch (mood) {
+      case 'excited':
+        return 'green';
+      case 'happy':
+        return 'yellow';
+      case 'meh':
+        return 'brown';
+      case 'sad':
+        return 'blue';
+      case 'dead':
+        return 'purple';
+      default:
+        return 'white';
+    }
   };
 
   const theme = {
@@ -53,6 +120,12 @@ const CalendarScreen = ({ route }) => {
         }}
       />
       </View>
+      <TouchableOpacity
+        style={styles.addButton}
+        onPress= {onPressHandler}
+      >
+        <Ionicons name="ios-add" size={30} color="white" />
+      </TouchableOpacity>
     </View>
   );
 };
@@ -65,7 +138,8 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 40,
-    padding: 40,
+    paddintTop: 20,
+    paddingBottom: 40,
     fontWeight: '600',
     color: '#5d4632',
     fontFamily: 'ProtestRiot-Regular'
@@ -86,6 +160,17 @@ const styles = StyleSheet.create({
     width: '100%', // Set width to 100% to occupy full width of parent container
     alignItems: 'center', // Center the calendar horizontally
     marginTop: 20,
+  },
+  addButton: {
+    position: 'absolute',
+    bottom: 20,
+    alignSelf: 'center',
+    backgroundColor: '#8fbc8f',
+    borderRadius: 30,
+    width: 60,
+    height: 60,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
 

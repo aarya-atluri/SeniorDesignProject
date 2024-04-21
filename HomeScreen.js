@@ -58,15 +58,16 @@ const HomeScreen = ({ navigation }) => {
 
   const fetchUserData = async () => {
     try {
-      const docRef = doc(db, 'users', auth.currentUser?.uid);
-      const docSnap = await getDoc(docRef);
-      if (docSnap.exists()) {
-        setUserData(docSnap.data());
+      if (!auth.currentUser) return; // Check if user is logged in
+      const userDocRef = doc(db, 'users', auth.currentUser.uid);
+      const userDocSnap = await getDoc(userDocRef);
+      if (userDocSnap.exists()) {
+        setUserData(userDocSnap.data());
       } else {
         console.log('No such document!');
       }
     } catch (error) {
-      console.error('Error getting document:', error);
+      console.error('Error fetching user data:', error);
     }
   };
 

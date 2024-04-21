@@ -9,39 +9,8 @@ const CompleteSetup = ({ route }) => {
   const { username, password, name, age, gender } = route.params;
   const { setIsSignedIn } = useContext(AuthContext);
 
-  const handleSignUp = async () => {
-    try {
-       const userCredential = await createUserWithEmailAndPassword(auth, username, password);
-      //const userCredential = await signInWithEmailAndPassword(auth, username, password);
-      const user = userCredential.user;
-
-      const userRef = doc(db, 'users', auth.currentUser.uid);
-      // const journalEntriesRef = collection(userRef, 'journal_entries');
-
-      // const defaultEntry = {
-      //   date: "", 
-      //   text: "",
-      //   mood: "Meh" 
-      // };
-
-      // Add user data to Firestore collection
-      await setDoc(userRef,{
-          email: username,
-          name,
-          gender,
-          age,
-          profile_pic: "",
-          // journalEntriesRef: [defaultEntry]
-      });
-
-
-      console.log("User added with ID: ", userRef.id);
-
-      setIsSignedIn(true);
-    } catch (error) {
-      console.error('Error creating user:', error);
-      // Handle error
-    }
+  const handleComplete = async () => {
+  setIsSignedIn(true);
   };
 
   return (
@@ -53,8 +22,8 @@ const CompleteSetup = ({ route }) => {
       />
       <Text style={styles.welcomeText}>Welcome </Text>
       <Text style={[styles.nameText, { color: 'darkviolet' }]}>{name}</Text>
-      <TouchableOpacity style={styles.swellButton} onPress={handleSignUp}>
-        <Text style={styles.buttonText}>On to Swell!</Text>
+      <TouchableOpacity style={styles.swellButton} onPress={handleComplete}>
+        <Text style={styles.buttonText}>Onto Swell!</Text>
       </TouchableOpacity>
     </View>
   );

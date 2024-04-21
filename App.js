@@ -13,6 +13,7 @@ import CalendarScreen from './CalendarScreen';
 import SpecificEntry from './SpecificEntry';
 import SignUpScreen from './SignUpScreen';
 import SignUpDetails from './SignUpDetails';
+import SignInDetails from './SignInDetails';
 import AgeInfo from './AgeInfo';
 import CompleteSetup from './CompleteSetup';
 
@@ -34,6 +35,7 @@ const AuthStackNavigator = () => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
     <Stack.Screen name="SignUp" component={SignUpScreen} />
     <Stack.Screen name="SignUpDetails" component={SignUpDetails} />
+    <Stack.Screen name="SignInDetails" component={SignInDetails} />
     <Stack.Screen name="AgeInfo" component={AgeInfo} />
     <Stack.Screen name="CompleteSetup" component={CompleteSetup} />
   </Stack.Navigator>

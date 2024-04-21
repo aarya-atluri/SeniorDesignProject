@@ -16,6 +16,11 @@ const SignUpScreen = ({ navigation }) => {
     navigation.navigate('SignUpDetails');
   };
 
+  const goToSignInDetails = () => {
+    // Navigate to the sign-up details screen
+    navigation.navigate('SignInDetails');
+  };
+
   const logoBeige = '#f7f4f2'; // Beige color
   const logoBrown = '#4f3422'; // Brown color
 
@@ -25,12 +30,11 @@ const SignUpScreen = ({ navigation }) => {
       <Text style={[styles.welcomeText, { color: logoBrown }]}>Welcome to Swell!</Text>
       <Text style={styles.descriptionText}>A mind and body app dedicated to helping you become so well.</Text>
       <Image source={require('./assets/welcome.png')} style={styles.logo2} />
-      <TouchableOpacity style={styles.buttonGoogle} onPress={() => signInWithEmailAndPassword(auth, 'test@gmail.com', 'password')}>
-        <Text style={styles.buttonText}>Sign In</Text>
+      <TouchableOpacity style={styles.customSignUpButton} onPress={goToSignInDetails}>
+        <Text style={styles.buttonTextCustom}>Sign in</Text>
       </TouchableOpacity>
-      <Text style={styles.orText}>— OR —</Text>
       <TouchableOpacity style={styles.customSignUpButton} onPress={goToSignUpDetails}>
-        <Text style={styles.buttonTextCustom}>Create a new account</Text>
+        <Text style={styles.buttonTextCustom}>Sign up</Text>
       </TouchableOpacity>
     </View>
   );
@@ -87,10 +91,11 @@ const styles = StyleSheet.create({
   },
   customSignUpButton: {
     backgroundColor: '#4f3422',
+    marginBottom: 20,
     paddingVertical: 12,
     paddingHorizontal: 30,
     borderRadius: 30,
-    width: '15%', // Adjusted to 80% for better appearance
+    width: 300, // Adjusted to 80% for better appearance
     alignItems: 'center',
   },
   buttonTextCustom: {

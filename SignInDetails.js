@@ -1,4 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
+import {useState} from 'react';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import { AuthContext } from './App';
+import { doc, setDoc, collection, addDoc, getDoc } from 'firebase/firestore';
+import { auth, db } from './Firebase/firebaseConfig';
 import {
   View,
   Text,
@@ -11,14 +16,32 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-const SignUpDetailsScreen = ({ navigation }) => {
+const SignInDetailsScreen = ({ navigation }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
 
-  const goToAgeInfo = () => {
-    // Navigate to the AgeInfo screen and pass along the collected data
-    navigation.navigate('AgeInfo', { username, password, name });
+  const handleContinue = async () => {
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, username, password);
+      const user = userCredential.user;
+
+      const userRef = doc(db, 'users', auth.currentUser.uid);
+      console.log("User signed in with ID: ", userRef.id);
+
+      // Fetch user data from Firestore
+      const userSnapshot = await getDoc(userRef);
+      const userData = userSnapshot.data();
+
+      // Extract user's name from userData
+      const named = userData.name;
+
+
+      navigation.navigate('CompleteSetup', { username, password, name: named });
+    } catch (error) {
+      console.error('Error signing in:', error);
+      // Handle error
+    }
   };
 
   return (
@@ -32,7 +55,7 @@ const SignUpDetailsScreen = ({ navigation }) => {
         style={styles.logo}
         resizeMode="contain"
       />
-      <Text style={[styles.headerText, { color: '#4f3422' }]}>Create Your Account!</Text>
+      <Text style={[styles.headerText, { color: '#4f3422' }]}>Sign Into Your Account!</Text>
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
@@ -43,19 +66,13 @@ const SignUpDetailsScreen = ({ navigation }) => {
         />
         <TextInput
           style={styles.input}
-          onChangeText={setName}
-          value={name}
-          placeholder="Name"
-        />
-        <TextInput
-          style={styles.input}
           onChangeText={setPassword}
           value={password}
           placeholder="Password"
           secureTextEntry
         />
-        <TouchableOpacity style={styles.nextButton} onPress={goToAgeInfo}>
-          <Text style={styles.buttonText}>Next</Text>
+        <TouchableOpacity style={styles.nextButton} onPress={handleContinue}>
+          <Text style={styles.buttonText}>Continue</Text>
           <View style={{ flexDirection: 'row' }}>
             <Ionicons name="arrow-forward" size={24} color="#f7f4f2" />
           </View>
@@ -96,7 +113,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#4f3422',
     padding: 10,
     borderRadius: 30, // A large borderRadius value will make it circular
-    width:300, // Width and Height should be the same for a circle
+    width: 300, // Width and Height should be the same for a circle
     height: 60, // Width and Height should be the same for a circle
     alignItems: 'center',
     justifyContent: 'center',
@@ -115,4 +132,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SignUpDetailsScreen;
+export default SignInDetailsScreen;

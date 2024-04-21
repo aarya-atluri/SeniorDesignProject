@@ -1,5 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Image } from 'react-native';
+import { doc, setDoc, collection, addDoc } from 'firebase/firestore';
+import { auth, db } from './Firebase/firebaseConfig';
+import { AuthContext } from './App';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 
 const AgeGenderScreen = ({ navigation, route }) => {
   const [age, setAge] = useState('');
@@ -9,10 +13,41 @@ const AgeGenderScreen = ({ navigation, route }) => {
   const { username, password, name } = route.params;
 
   const handleContinue = () => {
-    // Implement what happens when the user presses continue
-    // You could pass the age and gender along with the previously passed data to the next screen or make an API call, etc.
     console.log({ username, password, name, age, gender });
     navigation.navigate('CompleteSetup', { username, password, name, age, gender });
+  };
+
+  const handleSignUp = async () => {
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, username, password);
+      const user = userCredential.user;
+
+      const userRef = doc(db, 'users', auth.currentUser.uid);
+      // const journalEntriesRef = collection(userRef, 'journal_entries');
+
+      // const defaultEntry = {
+      //   date: "", 
+      //   text: "",
+      //   mood: "Meh" 
+      // };
+
+      // Add user data to Firestore collection
+      await setDoc(userRef,{
+          email: username,
+          name,
+          gender,
+          age,
+          profile_pic: "",
+          // journalEntriesRef: [defaultEntry]
+      });
+
+
+      console.log("User added with ID: ", userRef.id);
+      handleContinue();
+    } catch (error) {
+      console.error('Error creating user:', error);
+      // Handle error
+    }
   };
 
   return (
@@ -44,7 +79,7 @@ const AgeGenderScreen = ({ navigation, route }) => {
           <Text style={styles.genderText}>I am Female</Text>
         </TouchableOpacity>
       </View>
-      <TouchableOpacity style={styles.continueButton} onPress={handleContinue}>
+      <TouchableOpacity style={styles.continueButton} onPress={handleSignUp}>
         <Text style={styles.continueText}>Continue</Text>
       </TouchableOpacity>
     </ScrollView>
