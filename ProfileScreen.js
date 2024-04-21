@@ -5,6 +5,13 @@ import { auth } from './Firebase/firebaseConfig';
 
 import { user } from './CompleteSetup';
 
+import React from 'react';
+import { View, Text, StyleSheet, Button, Alert } from 'react-native';
+import { sendPasswordResetEmail } from 'firebase/auth';
+import { auth } from './Firebase/firebaseConfig';
+
+import { user } from './CompleteSetup';
+
 const ProfileScreen = () => {
   const [userData, setUserData] = useState(null);
 
@@ -58,7 +65,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
+    alignItems: 'center',
     justifyContent: 'center',
+    padding: 20,
+    backgroundColor: '#fff',
     padding: 20,
     backgroundColor: '#fff'
   },
