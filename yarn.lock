@@ -1703,6 +1703,8 @@
   dependencies:
     "@firebase/app-types" "0.9.1"
     "@firebase/util" "1.9.5"
+    "@firebase/app-types" "0.9.1"
+    "@firebase/util" "1.9.5"
 
 "@firebase/database@1.0.4":
   "integrity" "sha512-k84cXh+dtpzvY6yOhfyr1B+I1vjvSMtmlqotE0lTNVylc8m5nmOohjzpTLEQDrBWvwACX/VP5fEyajAdmnOKqA=="
@@ -1738,6 +1740,10 @@
   "resolved" "https://registry.npmjs.org/@firebase/firestore/-/firestore-4.5.1.tgz"
   "version" "4.5.1"
   dependencies:
+    "@firebase/component" "0.6.6"
+    "@firebase/logger" "0.4.1"
+    "@firebase/util" "1.9.5"
+    "@firebase/webchannel-wrapper" "0.10.6"
     "@firebase/component" "0.6.6"
     "@firebase/logger" "0.4.1"
     "@firebase/util" "1.9.5"
