@@ -39,7 +39,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
+    alignItems: 'center',
     justifyContent: 'center',
+    padding: 20,
+    backgroundColor: '#fff',
     padding: 20,
     backgroundColor: '#fff'
   },
@@ -59,4 +62,3 @@ const styles = StyleSheet.create({
 });
 
 export default ProfileScreen;
-
