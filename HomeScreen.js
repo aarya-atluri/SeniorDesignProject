@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
 import { auth, db } from './Firebase/firebaseConfig';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, Timestamp } from 'firebase/firestore';
 import { User } from 'firebase/auth';
 import { fetchJournalCount,  fetchJournalEntries, fetchLastMood, getButtonColorFromMood, fetchTodayTotal} from './JournalUtils';
 import MoodImage from './Mood'
@@ -27,32 +27,33 @@ const HomeScreen = ({ navigation }) => {
 
   // Function to calculate streak based on journal entries
   const calculateStreak = (journalEntries) => {
-    const today = new Date().toISOString().split('T')[0];
+    const today = new Date().toISOString().split('T')[0]; // Today's date in ISO format
     const sortedEntries = journalEntries.sort((a, b) => {
-      return new Date(a.date) - new Date(b.date);
+      return a.date.toMillis() - b.date.toMillis(); // Sort entries by date
     });
 
     let streak = 0;
-    let currentDate = today;
-
+    let currentDate = Timestamp.fromDate(new Date(today)); // Convert today's date to a Timestamp
+  
     for (let i = sortedEntries.length - 1; i >= 0; i--) {
-      const entryDate = sortedEntries[i].date;
+      const entryDate = sortedEntries[i].date.toDate(); // Convert Timestamp to JavaScript Date object
 
-      if (entryDate === currentDate) {
-        streak++;
-        currentDate = decrementDate(currentDate);
+      // Check if the entry date is the same as the current date
+      if (entryDate.toISOString().split('T')[0] === currentDate.toDate().toISOString().split('T')[0]) {
+        streak++; // Increment streak if there's an entry for the current date
+        currentDate = decrementDate(currentDate); // Move to the previous day
       } else {
-        break;
+        break; // Break the loop if there's no entry for the current date
       }
     }
-
+  
     return streak;
   };
 
   const decrementDate = (date) => {
-    const currentDate = new Date(date);
-    currentDate.setDate(currentDate.getDate() - 1);
-    return currentDate.toISOString().split('T')[0];
+    const currentDate = date.toDate(); // Convert Timestamp to JavaScript Date object
+    currentDate.setDate(currentDate.getDate() - 1); // Decrement the date by one day
+    return Timestamp.fromDate(currentDate); // Convert the JavaScript Date object back to Timestamp
   };
 
 
