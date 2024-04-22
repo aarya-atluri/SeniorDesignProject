@@ -75,14 +75,16 @@ const HomeScreen = ({ navigation }) => {
   // when component mounts
   useEffect(() => {
     fetchUserData();
-    fetchJournalCount(auth.currentUser?.uid, new Date().toISOString().split('T')[0]).then(count => setJournalCount(count));
-    fetchLastMood(auth.currentUser?.uid).then(mood => setLastMood(mood));
+    fetchJournalCount(auth.currentUser?.uid).then(count => setJournalCount(count));
+    fetchLastMood(auth.currentUser?.uid).then(mood => {
+      setLastMood(mood);
+      const color = getButtonColorFromMood(mood);
+      setCheckinButtonColor(color);
+    });
     fetchJournalEntries(auth.currentUser?.uid).then(entries => {
       const calculatedStreak = calculateStreak(entries);
       setStreak(calculatedStreak);
     });
-    const color = getButtonColorFromMood(lastMood);
-    setCheckinButtonColor(color);
     fetchTodayTotal(auth.currentUser?.uid).then(totals => {
       setSleepHoursTotal(totals.sleepHoursTotal);
       setSleepMinsTotal(totals.sleepMinsTotal);
@@ -144,7 +146,7 @@ const HomeScreen = ({ navigation }) => {
           >
             <View style={styles.buttonContent}>
               <View style={styles.buttonTextContainer}>
-                <Text style={styles.buttonText}>You checked in {journalCount ? journalCount: 0} times today!</Text>
+                <Text style={styles.buttonText}>You checked in {journalCount} {journalCount === 1 ? 'time' : 'times'} today!</Text>
                 <Text style={styles.buttonText}>Your mood was: {lastMood ? lastMood : 'Unknown'}</Text>
               </View>
               <MoodImage

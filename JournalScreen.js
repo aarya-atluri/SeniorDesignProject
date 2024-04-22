@@ -5,7 +5,7 @@ import { Image, TextInput, SafeAreaView, View, Text, StyleSheet, ScrollView} fro
 import { useFonts } from 'expo-font';
 import ImagePicker from 'react-native-image-picker';
 import { useNavigation } from '@react-navigation/native';
-import {auth, db} from './Firebase/firebaseConfig'
+import {auth, db, collection} from './Firebase/firebaseConfig'
 import {doc, getDoc} from 'firebase/firestore'
 
 
