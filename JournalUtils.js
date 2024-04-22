@@ -93,7 +93,6 @@ export const fetchJournalEntries = async (userId) => {
     );
     const querySnapshot = await getDocs(q);
     const journalEntries = querySnapshot.docs.map(doc => doc.data());
-    console.log(journalEntries);
     return journalEntries;
   } catch (error) {
     console.error('Error fetching journal entries:', error);
