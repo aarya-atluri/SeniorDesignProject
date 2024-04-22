@@ -76,17 +76,22 @@ const HomeScreen = ({ navigation }) => {
   // when component mounts
   useEffect(() => {
     fetchUserData();
+    // how many checkins today
     fetchJournalCount(auth.currentUser?.uid).then(count => setJournalCount(count));
+    // get mood and color
     fetchLastMood(auth.currentUser?.uid).then(mood => {
       setLastMood(mood);
       const color = getButtonColorFromMood(mood);
       setCheckinButtonColor(color);
     });
+    // streaks
     fetchJournalEntries(auth.currentUser?.uid).then(entries => {
       const calculatedStreak = calculateStreak(entries);
       setStreak(calculatedStreak);
     });
+    // daily health stats
     fetchTodayTotal(auth.currentUser?.uid).then(totals => {
+      console.log(totals);
       setSleepHoursTotal(totals.sleepHoursTotal);
       setSleepMinsTotal(totals.sleepMinsTotal);
       setPhysicalActivityMinsTotal(totals.physicalActivityMinsTotal);
