@@ -120,6 +120,7 @@ export const getButtonColorFromMood = (mood) => {
 export const fetchTodayTotal = async (userId) => {
   try {
     const today = new Date();
+    const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0);
     const totals = {
       sleepHoursTotal: 0,
       sleepMinsTotal: 0,
@@ -128,13 +129,16 @@ export const fetchTodayTotal = async (userId) => {
       caffeineTotal: 0,
       waterIntakeTotal: 0
     };
-
-    const totalQuery = query(collection(db, 'users', userId, 'journal_entries'), where('date', '>=', Timestamp.fromDate(today)));
+console.log(Timestamp.fromDate(today));
+    const totalQuery = query(
+      collection(db, 'users', userId, 'journal_entries'), 
+      where('date', '>=', Timestamp.fromDate(startOfDay))
+    );
     const querySnapshot = await getDocs(totalQuery);
 
-    console.log(querySnapshot);
     querySnapshot.forEach(doc => {
       const data = doc.data();
+      console.log(data);
       totals.sleepHoursTotal += data.sleep_hours || 0;
       totals.sleepMinsTotal += data.sleep_mins || 0;
       totals.physicalActivityHoursTotal += data.activity_hours || 0;
