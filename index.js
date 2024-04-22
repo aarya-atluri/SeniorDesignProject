@@ -12,7 +12,7 @@ admin.initializeApp();
 // Assuming you've set your OpenAI API key in Firebase functions config
 const apiKey = functions.config().openai.key;
 const openai = new OpenAI({
-    apiKey: apiKey,
+    apiKey: "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",
 });
 
 exports.processUploadAndRecommend = functions.storage.object().onFinalize(async (object) => {

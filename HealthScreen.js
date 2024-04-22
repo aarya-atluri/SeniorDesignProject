@@ -130,6 +130,7 @@ const styles = StyleSheet.create({
   },
   metricsContainer: {
     backgroundColor: '#fff',
+    borderRadius: 31,
     width: '70%',
     marginTop: 5,
     marginBottom: 2,

@@ -129,7 +129,7 @@ export const fetchTodayTotal = async (userId) => {
       caffeineTotal: 0,
       waterIntakeTotal: 0
     };
-console.log(Timestamp.fromDate(today));
+
     const totalQuery = query(
       collection(db, 'users', userId, 'journal_entries'), 
       where('date', '>=', Timestamp.fromDate(startOfDay))
@@ -138,7 +138,7 @@ console.log(Timestamp.fromDate(today));
 
     querySnapshot.forEach(doc => {
       const data = doc.data();
-      console.log(data);
+
       totals.sleepHoursTotal += data.sleep_hours || 0;
       totals.sleepMinsTotal += data.sleep_mins || 0;
       totals.physicalActivityHoursTotal += data.activity_hours || 0;
