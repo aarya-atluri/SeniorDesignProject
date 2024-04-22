@@ -96,4 +96,6 @@ async function storeRecommendationInFirestore(filePath, recommendation){
         recommendation,
         timestamp: admin.firestore.FieldValue.serverTimestamp(),
     });
+
 }
+
