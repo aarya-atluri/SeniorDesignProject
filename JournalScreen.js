@@ -10,8 +10,11 @@ import {doc, getDoc} from 'firebase/firestore'
 
 
 const JournalScreen = ({route}) => {
+  const [dailySleepHour, setDailySleepHour] = useState(0);
+  const [dailySleepMin, setDailySleepMin] = useState(0);
   const[dailySleep, setSleep] = useState('')
-  const[dailyExercise, setExercise] = useState('')
+  const[activityHr, setExerciseHour] = useState(0);
+  const[activityMins, setExerciseMin] = useState(0);
   const[dailyEntry, setDiary] = useState('')
   const[dailyWater, setWater] = useState('')
   const[dailyCaffeine, setCaffeine] = useState('')
@@ -28,11 +31,19 @@ const JournalScreen = ({route}) => {
   };
 
   const onSleepChangeHandler = (text) => {
+    const [hoursStr, minutesStr] = text.split(':');
+  
     setSleep(text);
+    setDailySleepHour(parseInt(hoursStr, 10));
+    setDailySleepMin(parseInt(minutesStr,10));
   };
 
   const onExerciseChangeHandler = (text) => {
-    setExercise(text);
+    const [activityhr, activitymin] = text.split(':');
+  
+    setSleep(text);
+    setExerciseHour(parseInt(activityhr, 10)); 
+    setExerciseMin(parseInt(activitymin, 10));
   };
 
   const onWaterChangeHandler = (text) => {
@@ -51,8 +62,10 @@ const JournalScreen = ({route}) => {
       await entryRef.add({
         date: todayDate,
         entry: dailyEntry,
-        sleep: dailySleep,
-        exercise: dailyExercise,
+        sleep_mins: dailySleepMin,
+        sleep_hours: dailySleepHour,
+        activity_hours: activityHr,
+        activtiy_mins: activityMins,
         water: dailyWater,
         caffeine: dailyCaffeine,
         mood: selectedMood ? getImageUrl(selectedMood) : null 
@@ -115,7 +128,7 @@ return (
       />
 
       <View style={styles.sameRow}>
-        <Text style ={styles.subSection}> Sleep</Text>
+        <Text style ={styles.subSection}> Sleep (_:_)</Text>
         <TextInput 
           placeholder = ""
           onChangeText = {onSleepChangeHandler}

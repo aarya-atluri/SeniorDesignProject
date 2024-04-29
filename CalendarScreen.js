@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'; // Import TouchableOpacity
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
-import {auth, db} from './Firebase/firebaseConfig'
-import {collection, query, where, doc, getDoc} from 'firebase/firestore'
-
+import { auth, db } from './Firebase/firebaseConfig';
+import { collection, query, where, getDocs } from 'firebase/firestore';
 
 const CalendarScreen = ({}) => {
   const [currentMonth, setCurrentMonth] = useState(new Date().toISOString().slice(0, 7));
@@ -15,22 +14,28 @@ const CalendarScreen = ({}) => {
   const handleDayPress = async (day) => {
     // Navigate to a different screen upon pressing a specific date
     const selectedDate = day.dateString;
-  
-  // Check if there are entries for the selected date
-    try {
-    const moodRef = collection(db, 'journal_entries');
-    const q = query(moodRef, where('date', '==', selectedDate));
-    const querySnapshot = await getDoc(q);
     
-    if (querySnapshot.size > 0) {
-      navigation.navigate('SpecificEntry', { selectedDate });
-    } else {
-      // Handle case where there are no entries for the selected date
-      console.log('No entries found for the selected date.');
+    // Check if there are entries for the selected date
+    try {
+      const user = auth.currentUser; // Get the current user
+      if (!user) {
+        console.log('No user found.');
+        return;
+      }
+      
+      const userEntriesRef = collection(db, 'users', user.uid, 'journal_entries'); // Reference to the user's journal entries collection
+      const q = query(userEntriesRef, where('date', '==', selectedDate)); // Query for entries with matching date
+      const querySnapshot = await getDocs(q);
+      
+      if (querySnapshot.size > 0) {
+        navigation.navigate('SpecificEntry', { selectedDate });
+      } else {
+        // Handle case where there are no entries for the selected date
+        console.log('No entries found for the selected date.');
+      }
+    } catch (error) {
+      console.error('Error fetching entries:', error);
     }
-  } catch (error) {
-    console.error('Error fetching entries:', error);
-  }
   };
 
   const onPressHandler =() => {
@@ -42,7 +47,7 @@ const CalendarScreen = ({}) => {
     const fetchMoods = async () => {
       try {
         const moodRef = collection(db, 'journal_entries');
-        const querySnapshot = await getDoc(moodRef);
+        const querySnapshot = await getDocs(moodRef);
         
         const markedDatesObject = {};
 

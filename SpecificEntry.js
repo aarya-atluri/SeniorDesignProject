@@ -3,7 +3,7 @@ import React from 'react';
 import { View, Text, StyleSheet, Image, TextInput, ScrollView, Button } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native'; 
 import {auth, db} from './Firebase/firebaseConfig'
-import {collection, query, where, doc, getDoc} from 'firebase/firestore'
+import {collection, query, where, doc, getDoc, addDoc} from 'firebase/firestore'
 
 const SpecificEntry =({route}) => {
   const [journalEntries, setJournalEntries] = useState([]);
