@@ -56,18 +56,18 @@ const JournalScreen = ({route}) => {
 
   const getImageUrl = (moodId) => {
     switch (moodId) {
-      case 1:
-        return './assets/images/excited.jpg';
-      case 2:
-        return './assets/images/happy.jpg';
-      case 3:
-        return './assets/images/meh.jpg';
-      case 4:
-        return './assets/images/sad.jpg';
-      case 5:
-        return './assets/images/dead.jpg';
+      case 'excited':
+        return '#E5EAD7'; // Green
+      case 'happy':
+        return '#FFEBC2'; // Yellow
+      case 'meh':
+        return '#E8DDD9'; // Brown
+      case 'sad':
+        return '#F7CFAB'; // Orange
+      case 'dead':
+        return '#DAD4FF'; // Purple
       default:
-        return null;
+        return '#fff'; // Default white color
     }
   };
   
