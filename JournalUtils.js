@@ -149,6 +149,8 @@ export const fetchTodayTotal = async (userId) => {
 
     totals.physicalActivityHoursTotal += Math.floor(totals.physicalActivityMinsTotal / 60);
     totals.physicalActivityMinsTotal = totals.physicalActivityMinsTotal % 60;
+    totals.sleepHoursTotal += Math.floor(totals.sleepMinsTotal / 60);
+    totals.sleepMinsTotal = totals.sleepMinsTotal % 60;
 
     return totals;
   } catch (error) {

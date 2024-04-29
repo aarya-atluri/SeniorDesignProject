@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
 import { auth, db } from './Firebase/firebaseConfig';
-import { doc, getDoc, Timestamp } from 'firebase/firestore';
+import { doc, getDoc, Timestamp , onSnapshot, unsubscribeUser} from 'firebase/firestore';
 import { User } from 'firebase/auth';
 import { fetchJournalCount,  fetchJournalEntries, fetchLastMood, getButtonColorFromMood, fetchTodayTotal} from './JournalUtils';
 import MoodImage from './Mood'
@@ -59,14 +59,16 @@ const HomeScreen = ({ navigation }) => {
 
   const fetchUserData = async () => {
     try {
-      if (!auth.currentUser) return; // Check if user is logged in
+      if (!auth.currentUser) return;
       const userDocRef = doc(db, 'users', auth.currentUser.uid);
-      const userDocSnap = await getDoc(userDocRef);
-      if (userDocSnap.exists()) {
-        setUserData(userDocSnap.data());
-      } else {
-        console.log('No such document!');
-      }
+      const unsubscribe = onSnapshot(userDocRef, (doc) => {
+        if (doc.exists()) {
+          setUserData(doc.data());
+        } else {
+          console.log('No such document!');
+        }
+      });
+      return unsubscribe; // Return the unsubscribe function to clean up the listener
     } catch (error) {
       console.error('Error fetching user data:', error);
     }
@@ -100,6 +102,15 @@ const HomeScreen = ({ navigation }) => {
       setWaterIntakeTotal(totals.waterIntakeTotal);
     });
   }, []);
+
+  // useEffect(() => {
+  //   const unsubscribeUser = fetchUserData();
+
+  //   // Clean up the listener when the component unmounts
+  //   return () => {
+  //     unsubscribeUser();
+  //   };
+  // }, []);
 
   const handleDayPress = (day) => {
     // Navigate to a different screen upon pressing a specific date

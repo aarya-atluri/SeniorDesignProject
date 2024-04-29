@@ -2,56 +2,64 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import { useNavigation } from '@react-navigation/native';
-import { Ionicons } from '@expo/vector-icons';
 import { auth, db } from './Firebase/firebaseConfig';
-import { collection, query, where, getDocs } from 'firebase/firestore';
+import { Ionicons } from '@expo/vector-icons';
+import { collection, query, where, getDocs, Timestamp, orderBy , limit} from 'firebase/firestore';
 
 const CalendarScreen = ({}) => {
   const [currentMonth, setCurrentMonth] = useState(new Date().toISOString().slice(0, 7));
   const [markedDates, setMarkedDates] = useState({});
-  const navigation = useNavigation(); // Initialize navigation
+  const navigation = useNavigation();
 
   const handleDayPress = async (day) => {
-    // Navigate to a different screen upon pressing a specific date
-    const selectedDate = day.dateString;
-    
-    // Check if there are entries for the selected date
     try {
-      const user = auth.currentUser; // Get the current user
+      const user = auth.currentUser;
       if (!user) {
         console.log('No user found.');
         return;
       }
-      
-      const userEntriesRef = collection(db, 'users', user.uid, 'journal_entries'); // Reference to the user's journal entries collection
-      const q = query(userEntriesRef, where('date', '==', selectedDate)); // Query for entries with matching date
+  
+      const selectedDate = day.dateString;
+      const dateOnlyTimestamp = Timestamp.fromDate(new Date(selectedDate)); // Convert selected date to Firestore timestamp at midnight
+  
+      const userEntriesRef = collection(db, 'users', user.uid, 'journal_entries');
+      const q = query(
+        userEntriesRef,
+        where('date', '>=', dateOnlyTimestamp),
+        where('date', '<', Timestamp.fromMillis(dateOnlyTimestamp.toMillis() + 86400000)), // Query using Firestore timestamp for the entire day
+        orderBy('date', 'desc'), // Order by date in descending order
+        limit(1) // Limit the result to the most recent entry
+      );
+  
       const querySnapshot = await getDocs(q);
-      
-      if (querySnapshot.size > 0) {
-        navigation.navigate('SpecificEntry', { selectedDate });
+  
+      if (!querySnapshot.empty) {
+        // Retrieve the first (most recent) document
+        const mostRecentEntry = querySnapshot.docs[0];
+        navigation.navigate('SpecificEntry', { thisEntry: mostRecentEntry.id }); // Pass the document ID to SpecificEntry
       } else {
-        // Handle case where there are no entries for the selected date
         console.log('No entries found for the selected date.');
+        // Optionally, you can navigate to a different screen or display a message
       }
     } catch (error) {
       console.error('Error fetching entries:', error);
+      // Handle the error appropriately, e.g., display an error message
     }
   };
 
-  const onPressHandler =() => {
-    navigation.navigate('Journal')
+  const onPressHandler = () => {
+    navigation.navigate('Journal');
   };
-
 
   useEffect(() => {
     const fetchMoods = async () => {
       try {
         const moodRef = collection(db, 'journal_entries');
         const querySnapshot = await getDocs(moodRef);
-        
+
         const markedDatesObject = {};
 
-        querySnapshot.forEach(doc => {
+        querySnapshot.forEach((doc) => {
           const data = doc.data();
           const date = data.date;
           const mood = data.mood;
@@ -96,39 +104,37 @@ const CalendarScreen = ({}) => {
     selectedDayBackgroundColor: 'green',
     arrowColor: 'orange',
     monthTextColor: '#d8e1e9',
-    'stylesheet.day.basic':{
-      'base':{
-        width:125,
-        height:40,
+    'stylesheet.day.basic': {
+      base: {
+        width: 125,
+        height: 40,
         alignItems: 'center',
         justifyContent: 'center',
         borderRadius: 20,
       },
-      'text': {
+      text: {
         marginTop: 6,
         fontSize: 16,
         fontFamily: 'ProtestRiot-Regular',
-      }
-    }
+      },
+    },
   };
+
   return (
     <View style={styles.container}>
       <Text style={styles.sectionTitle}>Your Mindful Journal</Text>
       <View style={styles.calendarContainer}>
         <Calendar
-        current={currentMonth}
-        onMonthChange={(month) => setCurrentMonth(month.dateString)}
-        onDayPress={handleDayPress} // Handle press event for a specific 
-        theme = {theme}
-        style={{
-          borderRadius: 15,
-        }}
-      />
+          current={currentMonth}
+          onMonthChange={(month) => setCurrentMonth(month.dateString)}
+          onDayPress={handleDayPress} // Handle press event for a specific date
+          theme={theme}
+          style={{
+            borderRadius: 15,
+          }}
+        />
       </View>
-      <TouchableOpacity
-        style={styles.addButton}
-        onPress= {onPressHandler}
-      >
+      <TouchableOpacity style={styles.addButton} onPress={onPressHandler}>
         <Ionicons name="ios-add" size={30} color="white" />
       </TouchableOpacity>
     </View>
@@ -143,11 +149,11 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 40,
-    paddintTop: 20,
+    paddingTop: 20,
     paddingBottom: 40,
     fontWeight: '600',
     color: '#5d4632',
-    fontFamily: 'ProtestRiot-Regular'
+    fontFamily: 'ProtestRiot-Regular',
   },
   text: {
     fontSize: 40,

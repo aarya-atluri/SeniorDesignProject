@@ -41,7 +41,6 @@ const JournalScreen = ({route}) => {
   const onExerciseChangeHandler = (text) => {
     const [activityhr, activitymin] = text.split(':');
   
-    setExercise(text);
     setExerciseHour(parseInt(activityhr, 10)); 
     setExerciseMin(parseInt(activitymin, 10));
   };
@@ -81,7 +80,7 @@ const JournalScreen = ({route}) => {
       const entryRef = collection(db, 'users', auth.currentUser?.uid, 'journal_entries');
       console.log('pressed check in');
 
-      let currentDate = Timestamp.fromDate(new Date(todayDate));
+      let currentDate = Timestamp.now();
       await addDoc(entryRef, {
         date: currentDate,
         entry: dailyEntry,

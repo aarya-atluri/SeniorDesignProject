@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 // code for health bars
 import { auth, db } from './Firebase/firebaseConfig';
-import { doc, getDoc, Timestamp } from 'firebase/firestore';
+import { doc, getDoc, Timestamp , onSnapshot} from 'firebase/firestore';
 import { User } from 'firebase/auth';
 import { PieChart } from 'react-native-chart-kit';
 
@@ -83,14 +83,16 @@ const HealthScreen = () => {
 
   const fetchUserData = async () => {
     try {
-      if (!auth.currentUser) return; // Check if user is logged in
+      if (!auth.currentUser) return;
       const userDocRef = doc(db, 'users', auth.currentUser.uid);
-      const userDocSnap = await getDoc(userDocRef);
-      if (userDocSnap.exists()) {
-        setUserData(userDocSnap.data());
-      } else {
-        console.log('No such document!');
-      }
+      const unsubscribe = onSnapshot(userDocRef, (doc) => {
+        if (doc.exists()) {
+          setUserData(doc.data());
+        } else {
+          console.log('No such document!');
+        }
+      });
+      return unsubscribe; // Return the unsubscribe function to clean up the listener
     } catch (error) {
       console.error('Error fetching user data:', error);
     }
