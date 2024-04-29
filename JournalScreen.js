@@ -7,6 +7,7 @@ import {auth, db} from './Firebase/firebaseConfig'
 import {collection, query, where, doc, getDoc} from 'firebase/firestore'
 
 
+<<<<<<< HEAD
 const CalendarScreen = ({}) => {
   const [currentMonth, setCurrentMonth] = useState(new Date().toISOString().slice(0, 7));
   const [markedDates, setMarkedDates] = useState({});
@@ -17,6 +18,54 @@ const CalendarScreen = ({}) => {
     const selectedDate = day.dateString;
   
   // Check if there are entries for the selected date
+=======
+const JournalScreen = ({route}) => {
+  const [dailySleepHour, setDailySleepHour] = useState(0);
+  const [dailySleepMin, setDailySleepMin] = useState(0);
+  const[dailySleep, setSleep] = useState('')
+  const[activityHr, setExerciseHour] = useState(0);
+  const[activityMins, setExerciseMin] = useState(0);
+  const[dailyEntry, setDiary] = useState('')
+  const[dailyWater, setWater] = useState('')
+  const[dailyCaffeine, setCaffeine] = useState('')
+  const [selectedMood, setMood] = useState(null);
+  
+  const navigation = useNavigation();
+
+  const onImageHandler = (imageId) => {
+    setMood(imageId);
+  }
+
+  const onTextChangeHandler = (text) => {
+    setDiary(text);
+  };
+
+  const onSleepChangeHandler = (text) => {
+    const [hoursStr, minutesStr] = text.split(':');
+  
+    setSleep(text);
+    setDailySleepHour(parseInt(hoursStr, 10));
+    setDailySleepMin(parseInt(minutesStr,10));
+  };
+
+  const onExerciseChangeHandler = (text) => {
+    const [activityhr, activitymin] = text.split(':');
+  
+    setSleep(text);
+    setExerciseHour(parseInt(activityhr, 10)); 
+    setExerciseMin(parseInt(activitymin, 10));
+  };
+
+  const onWaterChangeHandler = (text) => {
+    setWater(text);
+  };
+
+  const onCaffeineChangeHandler = (text) => {
+    setCaffeine(text);
+  };
+
+  const onPressHandler = async () => {
+>>>>>>> refs/remotes/origin/main
     try {
     const moodRef = collection(db, 'journal_entries');
     const q = query(moodRef, where('date', '==', selectedDate));
@@ -33,9 +82,22 @@ const CalendarScreen = ({}) => {
   }
   };
 
+<<<<<<< HEAD
   const onPressHandler =() => {
     navigation.navigate('Journal')
   };
+=======
+      await entryRef.add({
+        date: todayDate,
+        entry: dailyEntry,
+        sleep_mins: dailySleepMin,
+        sleep_hours: dailySleepHour,
+        activity_hours: activityHr,
+        activtiy_mins: activityMins,
+        water: dailyWater,
+        caffeine: dailyCaffeine,
+        mood: selectedMood ? getImageUrl(selectedMood) : null 
+>>>>>>> refs/remotes/origin/main
 
 
   useEffect(() => {
@@ -119,6 +181,18 @@ const CalendarScreen = ({}) => {
           borderRadius: 15,
         }}
       />
+<<<<<<< HEAD
+=======
+
+      <View style={styles.sameRow}>
+        <Text style ={styles.subSection}> Sleep (_:_)</Text>
+        <TextInput 
+          placeholder = ""
+          onChangeText = {onSleepChangeHandler}
+          value = {dailySleep}
+          style = {styles.statistics}
+          />
+>>>>>>> refs/remotes/origin/main
       </View>
       <TouchableOpacity
         style={styles.addButton}
