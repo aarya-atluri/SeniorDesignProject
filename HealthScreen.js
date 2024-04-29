@@ -7,7 +7,7 @@ import { User } from 'firebase/auth';
 import { PieChart } from 'react-native-chart-kit';
 
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import {fetchTodayTotal} from './JournalUtils';
+import {fetchTodayTotal, fetchPieChartData} from './JournalUtils';
 
   const MetricsBar = ({label, value, hours, minutes, maxValue, unit, color}) => {
     const percentage = (value / maxValue) * 100;
@@ -45,12 +45,35 @@ import {fetchTodayTotal} from './JournalUtils';
 //Test
 const HealthScreen = () => {
 
+  const [userData, setUserData] = useState(null);
+
   const [sleepHoursTotal, setSleepHoursTotal] = useState('');
   const [sleepMinsTotal, setSleepMinsTotal] = useState('');
   const [physicalActivityHoursTotal, setPhysicalActivityHoursTotal] = useState('');
   const [physicalActivityMinsTotal, setPhysicalActivityMinsTotal] = useState('');
   const [caffeineTotal, setCaffeineTotal] = useState('');
   const [waterIntakeTotal, setWaterIntakeTotal] = useState('');
+
+  const[goodSleepExcited, setGS1] = useState(0);
+  const[goodSleepHappy, setGS2] = useState(0);
+  const[goodSleepMeh, setGS3] = useState(0);
+  const[goodSleepSad, setGS4] = useState(0);
+  const[goodSleepDead, setGS5] = useState(0);
+  const[badSleepExcited, setBS1] = useState(0);
+  const[badSleepHappy, setBS2] = useState(0);
+  const[badSleepMeh, setBS3] = useState(0);
+  const[badSleepSad, setBS4] = useState(0);
+  const[badSleepDead, setBS5] = useState(0);
+  const[goodExerciseExcited, setGE1] = useState(0);
+  const[goodExerciseHappy, setGE2] = useState(0);
+  const[goodExerciseMeh, setGE3] = useState(0);
+  const[goodExerciseSad, setGE4] = useState(0);
+  const[goodExerciseDead, setGE5] = useState(0);
+  const[badExerciseExcited, setBE1] = useState(0);
+  const[badExerciseHappy, setBE2] = useState(0);
+  const[badExerciseMeh, setBE3] = useState(0);
+  const[badExerciseSad, setBE4] = useState(0);
+  const[badExerciseDead, setBE5] = useState(0);
 
   const getLocalDate = () => {
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
@@ -87,41 +110,66 @@ const HealthScreen = () => {
       setCaffeineTotal(totals.caffeineTotal);
       setWaterIntakeTotal(totals.waterIntakeTotal);
     });
+
+    // pie charts
+    fetchPieChartData(auth.currentUser?.uid).then(data => {
+      console.log(data);
+      setGS1(data.goodSleepExcited);
+      setGS2(data.goodSleepHappy);
+      setGS3(data.goodSleepMeh);
+      setGS4(data.goodSleepSad);
+      setGS5(data.goodSleepDead);
+      setBS1(data.badSleepExcited);
+      setBS2(data.badSleepHappy);
+      setBS3(data.badSleepMeh);
+      setBS4(data.badSleepSad);
+      setBS5(data.badSleepDead);
+      setGE1(data.goodExerciseExcited);
+      setGE2(data.goodExerciseHappy);
+      setGE3(data.goodExerciseMeh);
+      setGE4(data.goodExerciseSad);
+      setGE5(data.goodExerciseDead);
+      setBE1(data.badExerciseExcited);
+      setBE2(data.badExerciseHappy);
+      setBE3(data.badExerciseMeh);
+      setBE4(data.badExerciseSad);
+      setBE5(data.badExerciseDead);
+    });
   }, []);
 
 
   // pie charts
 
   const sleepBad = [
-    { name: 'Excited', count: 1, color: '#E5EAD7', legendFontFamily: 'Arial', legendFontSize: 12.5},
-    { name: 'Happy', count: 1, color: '#FFEBC2', legendFontFamily: 'Arial', legendFontSize: 12.5 },
-    { name: 'Meh', count: 5, color: '#E8DDD9', legendFontFamily: 'Arial', legendFontSize: 12.5 },
-    { name: 'Sad', count: 5, color: '#F7CFAB', legendFontFamily: 'Arial', legendFontSize: 12.5 },
-    { name: 'Dead', count: 10, color: '#DAD4FF', legendFontFamily: 'Arial', legendFontSize: 12.5 },
+    { name: 'Excited', count: badSleepExcited, color: '#E5EAD7', legendFontFamily: 'Arial', legendFontSize: 12.5},
+    { name: 'Happy', count: badSleepHappy, color: '#FFEBC2', legendFontFamily: 'Arial', legendFontSize: 12.5 },
+    { name: 'Meh', count: badSleepMeh, color: '#E8DDD9', legendFontFamily: 'Arial', legendFontSize: 12.5 },
+    { name: 'Sad', count: badSleepSad, color: '#F7CFAB', legendFontFamily: 'Arial', legendFontSize: 12.5 },
+    { name: 'Dead', count: badSleepDead, color: '#DAD4FF', legendFontFamily: 'Arial', legendFontSize: 12.5 },
   ];
   
   const sleepGood = [
-    { name: 'Excited', count: 10, color: '#E5EAD7', legendFontFamily: 'Arial', legendFontSize: 12.5 },
-    { name: 'Happy', count: 5, color: '#FFEBC2', legendFontFamily: 'Arial', legendFontSize: 12.5 },
-    { name: 'Meh', count: 5, color: '#E8DDD9', legendFontFamily: 'Arial', legendFontSize: 12.5 },
-    { name: 'Sad', count: 1, color: '#F7CFAB', legendFontFamily: 'Arial', legendFontSize: 12.5 },
-    { name: 'Dead', count: 1, color: '#DAD4FF', legendFontFamily: 'Arial', legendFontSize: 12.5 },
+    { name: 'Excited', count: goodSleepExcited, color: '#E5EAD7', legendFontFamily: 'Arial', legendFontSize: 12.5 },
+    { name: 'Happy', count: goodSleepHappy, color: '#FFEBC2', legendFontFamily: 'Arial', legendFontSize: 12.5 },
+    { name: 'Meh', count: goodSleepMeh, color: '#E8DDD9', legendFontFamily: 'Arial', legendFontSize: 12.5 },
+    { name: 'Sad', count: goodSleepSad, color: '#F7CFAB', legendFontFamily: 'Arial', legendFontSize: 12.5 },
+    { name: 'Dead', count: goodSleepDead, color: '#DAD4FF', legendFontFamily: 'Arial', legendFontSize: 12.5 },
   ];
   
   const exerciseBad = [
-    { name: 'Excited', count: 2, color: '#E5EAD7', legendFontFamily: 'Arial', legendFontSize: 12.5 },
-    { name: 'Happy', count: 3, color: '#FFEBC2', legendFontFamily: 'Arial', legendFontSize: 12.5 },
-    { name: 'Meh', count: 7, color: '#E8DDD9', legendFontFamily: 'Arial', legendFontSize: 12.5 },
-    { name: 'Sad', count: 6, color: '#F7CFAB', legendFontFamily: 'Arial', legendFontSize: 12.5 },
-    { name: 'Dead', count: 4, color: '#DAD4FF', legendFontFamily: 'Arial', legendFontSize: 12.5 },
+    { name: 'Excited', count: badExerciseExcited, color: '#E5EAD7', legendFontFamily: 'Arial', legendFontSize: 12.5 },
+    { name: 'Happy', count: badExerciseHappy, color: '#FFEBC2', legendFontFamily: 'Arial', legendFontSize: 12.5 },
+    { name: 'Meh', count: badExerciseMeh, color: '#E8DDD9', legendFontFamily: 'Arial', legendFontSize: 12.5 },
+    { name: 'Sad', count: badExerciseSad, color: '#F7CFAB', legendFontFamily: 'Arial', legendFontSize: 12.5 },
+    { name: 'Dead', count: badExerciseDead, color: '#DAD4FF', legendFontFamily: 'Arial', legendFontSize: 12.5 },
   ];
   
   const exerciseGood = [
-    { name: 'Excited', count: 10, color: '#E5EAD7', legendFontFamily: 'Arial', legendFontSize: 12.5 },
-    { name: 'Happy', count: 9, color: '#FFEBC2', legendFontFamily: 'Arial', legendFontSize: 12.5 },
-    { name: 'Meh', count: 3, color: '#E8DDD9', legendFontFamily: 'Arial', legendFontSize: 12.5 },
-    { name: 'Sad', count: 0, color: '#F7CFAB', legendFontFamily: 'Arial', legendFontSize: 12.5 },
-    { name: 'Dead', count: 0, color: '#DAD4FF', legendFontFamily: 'Arial', legendFontSize: 12.5 },
+    { name: 'Excited', count: goodExerciseExcited, color: '#E5EAD7', legendFontFamily: 'Arial', legendFontSize: 12.5 },
+    { name: 'Happy', count: goodExerciseHappy, color: '#FFEBC2', legendFontFamily: 'Arial', legendFontSize: 12.5 },
+    { name: 'Meh', count: goodExerciseMeh, color: '#E8DDD9', legendFontFamily: 'Arial', legendFontSize: 12.5 },
+    { name: 'Sad', count: goodExerciseSad, color: '#F7CFAB', legendFontFamily: 'Arial', legendFontSize: 12.5 },
+    { name: 'Dead', count: goodExerciseDead, color: '#DAD4FF', legendFontFamily: 'Arial', legendFontSize: 12.5 },
   ];
   
   const chartConfig = {
@@ -150,67 +198,68 @@ const HealthScreen = () => {
       </View>
       <View style={styles.metricsContainer}> <View>
       <View style={styles.metricsContainer}>
-        <Text style={{ fontSize: 20, fontWeight: 'bold', textAlign: 'center' }}>Hours of sleep and how you felt:</Text>
-        <View style={{ flexDirection: 'row' }}>
-          <View style={{ flex: 1, alignItems: 'center', marginRight: 10 }}>
-            <Text style={{ fontSize: 16, fontWeight: 'bold' }}>Less than 7 hours</Text>
-            <PieChart
-              data={sleepBad}
-              width={250}
-              height={150}
-              chartConfig={chartConfig}
-              accessor="count"
-              backgroundColor="transparent"
-              paddingLeft="25"
-              absolute
-            />
-          </View>
-          <View style={{ flex: 1, alignItems: 'center', marginLeft: 10 }}>
-            <Text style={{ fontSize: 16, fontWeight: 'bold' }}>7+ hours</Text>
-            <PieChart
-              data={sleepGood}
-              width={250}
-              height={150}
-              chartConfig={chartConfig}
-              accessor="count"
-              backgroundColor="transparent"
-              paddingLeft="25"
-              absolute
-            />
-          </View>
-        </View>
-      </View>
-      <View style={{ marginTop: 20 }}>
-        <Text style={{ fontSize: 20, fontWeight: 'bold', textAlign: 'center' }}>Physical activity and how you felt:</Text>
-        <View style={{ flexDirection: 'row' }}>
-          <View style={{ flex: 1, alignItems: 'center', marginRight: 10 }}>
-            <Text style={{ fontSize: 16, fontWeight: 'bold' }}>Less than 30 minutes</Text>
-            <PieChart
-              data={exerciseBad}
-              width={250}
-              height={150}
-              chartConfig={chartConfig}
-              accessor="count"
-              backgroundColor="transparent"
-              paddingLeft="25"
-              absolute
-            />
-          </View>
-          <View style={{ flex: 1, alignItems: 'center', marginLeft: 10 }}>
-            <Text style={{ fontSize: 16, fontWeight: 'bold' }}>30+ minutes</Text>
-            <PieChart
-              data={exerciseGood}
-              width={250}
-              height={150}
-              chartConfig={chartConfig}
-              accessor="count"
-              backgroundColor="transparent"
-              paddingLeft="25"
-              absolute
-            />
-          </View>
-        </View>
-      </View>
+  <Text style={{ fontSize: 20, fontWeight: 'bold', textAlign: 'center', marginBottom: 10 }}>Hours of sleep and how you felt:</Text>
+  <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+    <View style={styles.chartContainer}>
+      <Text style={{ fontSize: 16, fontWeight: 'bold', textAlign: 'center', marginBottom: 5 }}>Less than 7 hours</Text>
+      <PieChart
+        data={sleepBad}
+        width={250}
+        height={150}
+        chartConfig={chartConfig}
+        accessor="count"
+        backgroundColor="transparent"
+        paddingLeft="25"
+        absolute
+      />
+    </View>
+    <View style={styles.chartContainer}>
+      <Text style={{ fontSize: 16, fontWeight: 'bold', textAlign: 'center', marginBottom: 5 }}>7+ hours</Text>
+      <PieChart
+        data={sleepGood}
+        width={250}
+        height={150}
+        chartConfig={chartConfig}
+        accessor="count"
+        backgroundColor="transparent"
+        paddingLeft="25"
+        absolute
+      />
+    </View>
+  </View>
+</View>
+<View style={[styles.metricsContainer, { marginTop: 20 }]}>
+  <Text style={{ fontSize: 20, fontWeight: 'bold', textAlign: 'center', marginBottom: 10 }}>Physical activity and how you felt:</Text>
+  <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+    <View style={styles.chartContainer}>
+      <Text style={{ fontSize: 16, fontWeight: 'bold', textAlign: 'center', marginBottom: 5 }}>Less than 30 mins</Text>
+      <PieChart
+        data={exerciseBad}
+        width={250}
+        height={150}
+        chartConfig={chartConfig}
+        accessor="count"
+        backgroundColor="transparent"
+        paddingLeft="25"
+        absolute
+      />
+    </View>
+    <View style={styles.chartContainer}>
+      <Text style={{ fontSize: 16, fontWeight: 'bold', textAlign: 'center', marginBottom: 5 }}>30+ minutes</Text>
+      <PieChart
+        data={exerciseGood}
+        width={250}
+        height={150}
+        chartConfig={chartConfig}
+        accessor="count"
+        backgroundColor="transparent"
+        paddingLeft="25"
+        absolute
+      />
+    </View>
+  </View>
+</View>
+
     </View>
 
       </View>

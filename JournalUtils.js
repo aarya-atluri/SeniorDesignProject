@@ -156,3 +156,121 @@ export const fetchTodayTotal = async (userId) => {
     return {};
   }
 };
+
+export const fetchPieChartData = async (userId) => {
+  try {
+    const totalQuery = query(
+      collection(db, 'users', userId, 'journal_entries')
+    );
+    const querySnapshot = await getDocs(totalQuery);
+
+    const moodCounts = {
+      goodSleepExcited: 0,
+      goodSleepHappy: 0,
+      goodSleepMeh: 0,
+      goodSleepSad: 0,
+      goodSleepDead: 0,
+      badSleepExcited: 0,
+      badSleepHappy: 0,
+      badSleepMeh: 0,
+      badSleepSad: 0,
+      badSleepDead: 0,
+      goodExerciseExcited: 0,
+      goodExerciseHappy: 0,
+      goodExerciseMeh: 0,
+      goodExerciseSad: 0,
+      goodExerciseDead: 0,
+      badExerciseExcited: 0,
+      badExerciseHappy: 0,
+      badExerciseMeh: 0,
+      badExerciseSad: 0,
+      badExerciseDead: 0
+    }
+
+    querySnapshot.forEach(doc => {
+      const data = doc.data();
+      console.log('Data from document:', data);
+      if(data.sleep_hours >= 7) {
+        switch (data.mood) {
+          case 'excited':
+            moodCounts.goodSleepExcited += 1;
+            break;
+          case 'happy':
+            moodCounts.goodSleepHappy += 1;
+            break;
+          case 'meh':
+            moodCounts.goodSleepMeh += 1;
+            break;
+          case 'sad':
+            moodCounts.goodSleepSad += 1;
+            break;
+          case 'dead':
+            moodCounts.goodSleepDead += 1;
+            break;
+        }
+      } else {
+        switch (data.mood) {
+          case 'excited':
+            moodCounts.badSleepExcited += 1;
+            break;
+          case 'happy':
+            moodCounts.badSleepHappy += 1;
+            break;
+          case 'meh':
+            moodCounts.badSleepMeh += 1;
+            break;
+          case 'sad':
+            moodCounts.badSleepSad += 1;
+            break;
+          case 'dead':
+            moodCounts.badSleepDead += 1;
+            break;
+        }
+      }
+ 
+      if(data.activity_hours >= 1 || data.activity_mins >= 30) {
+        switch (data.mood) {
+          case 'excited':
+            moodCounts.goodExerciseExcited += 1;
+            break;
+          case 'happy':
+            moodCounts.goodExerciseHappy += 1;
+            break;
+          case 'meh':
+            moodCounts.goodExerciseMeh += 1;
+            break;
+          case 'sad':
+            moodCounts.goodExerciseSad += 1;
+            break;
+          case 'dead':
+            moodCounts.goodExerciseDead += 1;
+            break;
+        }
+      } else {
+        switch (data.mood) {
+          case 'excited':
+            moodCounts.badExerciseExcited += 1;
+            break;
+          case 'happy':
+            moodCounts.badExerciseHappy += 1;
+            break;
+          case 'meh':
+            moodCounts.badExerciseMeh += 1;
+            break;
+          case 'sad':
+            moodCounts.badExerciseSad += 1;
+            break;
+          case 'dead':
+            moodCounts.badExerciseDead += 1;
+            break;
+        }
+      }
+    });
+    console.log(moodCounts)
+    return moodCounts;
+
+  } catch (error) {
+    console.error('Error fetching pie chart data:', error);
+    return {};
+  }
+};
