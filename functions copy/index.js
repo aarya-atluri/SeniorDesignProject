@@ -5,6 +5,7 @@ const sharp = require('sharp');
 const { Storage } = require('@google-cloud/storage');
 const storage = new Storage();
 const { OpenAI } = require("openai");
+const twilio = require('twilio')(accountSid, authToken);
 // const { getDoc, doc } = require('firebase/firestore');
 
 admin.initializeApp();
@@ -14,34 +15,54 @@ admin.initializeApp();
 const openai = new OpenAI({
     apiKey: 'have-to-change',
 });
+const accountSid = functions.config().twilio.sid;
+const authToken = functions.config().twilio.token;
+const client = new twilio(accountSid, authToken);
+
+exports.testRecommendationAndSMS = functions.https.onCall(async (data, context) => {
+    const userUid = "m7eGDDVaBANHUHOoVrjZufCojbw1";
+    const recommendation = "Remember to take breaks every 30 minutes to reduce screen strain.";
+    const screenTimeCount = 5;
+    const socialInteractionCount = 2;
+
+    storeRecommendationInFirestore(userUid, recommendation);
+
+    const hardcodedPhoneNumber = "+15125573223";
+    await sendSMS(hardcodedPhoneNumber, recommendation);
+
+
+    addUserCameraLogEntry(userUid, screenTimeCount, socialInteractionCount);
+
+    res.send("Test function executed successfully");
+});
 
 exports.processUploadAndRecommend = functions.storage.object().onFinalize(async (object) => {
-    const bucketName = object.bucket;
-    const filePath = object.name; // The file path in the storage bucket 
-    const bucket = storage.bucket(bucketName);
-    const file = bucket.file(filePath)
-     // const userUid = extractUserUidFromFilePath(filePath);
+//     const bucketName = object.bucket;
+//     const filePath = object.name; // The file path in the storage bucket 
+//     const bucket = storage.bucket(bucketName);
+//     const file = bucket.file(filePath);
+//     const userUid = extractUserUidFromFilePath(/users/m7eGDDVaBANHUHOoVrjZufCojbw1);
     
-    //  try {
-    //     const imageBuffer = await file.download();
+//     //  try {
+//     //     const imageBuffer = await file.download();
       
-    //     let processedImageBuffer;
-    //     try {
-    //       processedImageBuffer = await sharp(imageBuffer)
-    //         .rotate() // Automatically adjust orientation based on EXIF data
-    //         .sharpen() // Sharpen the image
-    //         .toBuffer();
-    //     } catch (sharpError) {
-    //       console.error('An error occurred while processing the image with sharp:', sharpError);
-    //       throw sharpError;
-    //     }
+//     //     let processedImageBuffer;
+//     //     try {
+//     //       processedImageBuffer = await sharp(imageBuffer)
+//     //         .rotate() // Automatically adjust orientation based on EXIF data
+//     //         .sharpen() // Sharpen the image
+//     //         .toBuffer();
+//     //     } catch (sharpError) {
+//     //       console.error('An error occurred while processing the image with sharp:', sharpError);
+//     //       throw sharpError;
+//     //     }
       
-    //     await file.save(processedImageBuffer, { resumable: false });
-    //     console.log('Processed image uploaded.');
-    //   } catch (error) {
-    //     console.error('An error occurred while processing the image', error);
-    //     throw error;
-    //   }
+//     //     await file.save(processedImageBuffer, { resumable: false });
+//     //     console.log('Processed image uploaded.');
+//     //   } catch (error) {
+//     //     console.error('An error occurred while processing the image', error);
+//     //     throw error;
+//     //   }
 
     const imageLabels = await analyzeImageWithCloudVisionAPI(`gs://${bucketName}/${filePath}`);
     console.log('Detected Labels:', imageLabels);
@@ -53,15 +74,27 @@ exports.processUploadAndRecommend = functions.storage.object().onFinalize(async 
             throw new Error('Recommendation is undefined');
         }
 
-        await storeRecommendationInFirestore(filePath, recommendation);
+        await storeRecommendationInFirestore(userUid, recommendation);
     } catch(error) {
         console.error('Error during the recommendation process:', error);
     }
 
     console.log(`Recommendation stored for ${filePath}`);
 
-    // const token = getTokenForUser(userUid);
-    // await sendNotification(token, recommendation);
+    // const userDoc = await admin.firestore().collection('users').doc(userUid).get();
+    // if (userDoc.exists) {
+    //     const userPhone = userDoc.data().phone;
+    //     await sendSMS(userPhone, recommendation);
+    // } else {
+    //     console.error('User document does not exist: ', userUid);
+    // }
+
+    const hardcodedPhoneNumber = "myphonenumber";
+    await sendSMS(hardcodedPhoneNumber, recommendation);
+
+    console.log('SMS sent to number successfully');
+
+    await addUserCameraLogEntry(userUid, screenTimeCount, socialInteractionCount);
 });
 
 // Get Labels from images 
@@ -160,18 +193,17 @@ async function getWellnessRecommendation(labels) {
 }
 
 // Store recommendation in Firestore
-async function storeRecommendationInFirestore(filePath, recommendation) {
+async function storeRecommendationInFirestore(userUid, recommendation) {
     try {
-        const docId = filePath.replace(/\..+$/, '').replace(/\//g, '_');
-        await admin.firestore().collection('recommendations').doc(docId).set({
-            filePath,
+        const recommendationsRef = admin.firestore().collection('users').doc(userUis).collection('recommendations');
+        await recommendationsRef.add({
             recommendation,
             timestamp: admin.firestore.FieldValue.serverTimestamp(),
         });
-        console.log('Recommendation stored successfully.');
-    } catch (error) {
-        console.error('Error storing recommendation:', error);
-    }
+        console.log('Recommendation stored successfully for user:', userUid);
+        } catch(error) {
+            console.error('Error storing recommendation for user: ', userUid, error);
+        }
 }
 
 // async function sendNotification(token, recommendation){
@@ -202,3 +234,39 @@ async function storeRecommendationInFirestore(filePath, recommendation) {
 //       return null; // Handle case where token is not found
 //     }
 //   }
+
+async function sendSMS(to, message) {
+    try {
+        const response = await client.messages.create({
+            body: message,
+            to: to,
+            from: "+18556196155",
+        });
+        console.log('Message sent', response.sid);
+    } catch (error) {
+        console.error('Failed to send SMS: ', error);
+    }
+}
+
+async function addUserCameraLogEntry(userUid, screenTimeCount, socialInteractionCount){
+    const cameraLogsRef = admin.firestore().collection('users').doc(userUid).collection('camera_logs');
+
+    const cameraLogEntry = {
+        screenTime: screenTimeCount*10,
+        socialInteractions: socialInteractionCount*10,
+        timestamp: admin.firestore.FieldValue.serverTimestamp()
+    };
+
+    try{
+        await cameraLogsRef.add(cameraLogEntry);
+        console.log('Camera log entry added successfully for user: ', userUid);
+    } catch (error) { 
+        console.error('Error adding camera log entry for user: ', userUid, error);
+    }
+}
+
+function extractUserUidFromFilePath(filePath) {
+    const segments = filePath.split('/');
+    const userUid = segments[0];
+    return userUid;
+}
