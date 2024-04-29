@@ -34,19 +34,19 @@ const HomeScreen = ({ navigation }) => {
 
     let streak = 0;
     let currentDate = Timestamp.fromDate(new Date(today)); // Convert today's date to a Timestamp
-  
+    let uniqueDates = new Set(); // Set to store unique dates
+
     for (let i = sortedEntries.length - 1; i >= 0; i--) {
       const entryDate = sortedEntries[i].date.toDate(); // Convert Timestamp to JavaScript Date object
 
-      // Check if the entry date is the same as the current date
-      if (entryDate.toISOString().split('T')[0] === currentDate.toDate().toISOString().split('T')[0]) {
-        streak++; // Increment streak if there's an entry for the current date
+      // Check if the entry date is unique and not the same as the current date
+      if (!uniqueDates.has(entryDate.toISOString().split('T')[0]) && entryDate.toISOString().split('T')[0] === currentDate.toDate().toISOString().split('T')[0]) {
+        uniqueDates.add(entryDate.toISOString().split('T')[0]); // Add unique date to set
+        streak++; // Increment streak for each unique date
         currentDate = decrementDate(currentDate); // Move to the previous day
-      } else {
-        break; // Break the loop if there's no entry for the current date
       }
     }
-  
+    
     return streak;
   };
 
