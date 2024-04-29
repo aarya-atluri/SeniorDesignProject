@@ -6,7 +6,7 @@ import { useFonts } from 'expo-font';
 import ImagePicker from 'react-native-image-picker';
 import { useNavigation } from '@react-navigation/native';
 import {auth, db} from './Firebase/firebaseConfig'
-import {doc, getDoc, collection, Timestamp, add} from 'firebase/firestore'
+import {doc, getDoc, collection, Timestamp, add, addDoc} from 'firebase/firestore'
 
 
 const JournalScreen = ({route}) => {
@@ -16,8 +16,8 @@ const JournalScreen = ({route}) => {
   const[activityHr, setExerciseHour] = useState(0);
   const[activityMins, setExerciseMin] = useState(0);
   const[dailyEntry, setDiary] = useState('')
-  const[dailyWater, setWater] = useState('')
-  const[dailyCaffeine, setCaffeine] = useState('')
+  const[dailyWater, setWater] = useState(0)
+  const[dailyCaffeine, setCaffeine] = useState(0)
   const [selectedMood, setMood] = useState(null);
   
   const navigation = useNavigation();
@@ -47,25 +47,25 @@ const JournalScreen = ({route}) => {
   };
 
   const onWaterChangeHandler = (text) => {
-    setWater(text);
+    setWater(parseInt(text,10));
   };
 
   const onCaffeineChangeHandler = (text) => {
-    setCaffeine(text);
+    setCaffeine(parseInt(text,10));
   };
 
   const getImageUrl = (moodId) => {
     switch (moodId) {
       case 'excited':
-        return '#E5EAD7'; // Green
+        return 'excited'; // Green
       case 'happy':
-        return '#FFEBC2'; // Yellow
+        return 'happy'; // Yellow
       case 'meh':
-        return '#E8DDD9'; // Brown
+        return 'meh'; // Brown
       case 'sad':
-        return '#F7CFAB'; // Orange
+        return 'sad'; // Orange
       case 'dead':
-        return '#DAD4FF'; // Purple
+        return 'dead'; // Purple
       default:
         return '#fff'; // Default white color
     }
@@ -74,23 +74,21 @@ const JournalScreen = ({route}) => {
 
   const onPressHandler = async () => {
     try {
-      const user = auth.currentUser;
       const todayDate = new Date().toLocaleDateString(); 
       const entryRef = collection(db, 'users', auth.currentUser?.uid, 'journal_entries');
       console.log('pressed check in');
 
       let currentDate = Timestamp.fromDate(new Date(todayDate));
-      entryRef.add({
+      await addDoc(entryRef, {
         date: currentDate,
         entry: dailyEntry,
         sleep_mins: dailySleepMin,
         sleep_hours: dailySleepHour,
         activity_hours: activityHr,
-        activtiy_mins: activityMins,
+        activity_mins: activityMins, // Corrected the typo in the field name
         water: dailyWater,
         caffeine: dailyCaffeine,
         mood: selectedMood ? getImageUrl(selectedMood) : null 
-
       });
 
     navigation.goBack();
@@ -149,7 +147,7 @@ return (
       />
 
       <View style={styles.sameRow}>
-        <Text style ={styles.subSection}> Sleep _:_</Text>
+        <Text style ={styles.subSection}> Sleep </Text>
         <TextInput 
           placeholder = ""
           onChangeText = {onSleepChangeHandler}
@@ -158,7 +156,7 @@ return (
       </View>
 
       <View style={styles.sameRow}>
-          <Text style ={styles.subSection}> Exercise _:_ </Text>
+          <Text style ={styles.subSection}> Exercise </Text>
           <TextInput 
           placeholder = ""
           onChangeText = {onExerciseChangeHandler}

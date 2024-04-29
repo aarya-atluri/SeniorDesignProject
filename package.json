@@ -13,7 +13,7 @@
     "@react-navigation/native": "*",
     "@react-navigation/stack": "^6.3.21",
     "@types/react": "~18.2.45",
-    "expo": "^50.0.6",
+    "expo": "^50.0.17",
     "expo-auth-session": "~5.4.0",
     "expo-crypto": "~12.8.0",
     "expo-dev-client": "~3.3.8",
