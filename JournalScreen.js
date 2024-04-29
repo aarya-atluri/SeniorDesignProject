@@ -5,8 +5,8 @@ import { Image, TextInput, SafeAreaView, View, Text, StyleSheet, ScrollView} fro
 import { useFonts } from 'expo-font';
 import ImagePicker from 'react-native-image-picker';
 import { useNavigation } from '@react-navigation/native';
-import {auth, db, collection} from './Firebase/firebaseConfig'
-import {doc, getDoc} from 'firebase/firestore'
+import {auth, db} from './Firebase/firebaseConfig'
+import {doc, getDoc, collection} from 'firebase/firestore'
 
 
 const JournalScreen = ({route}) => {
@@ -56,10 +56,12 @@ const JournalScreen = ({route}) => {
 
   const onPressHandler = async () => {
     try {
+      const user = auth.currentUser;
       const todayDate = new Date().toLocaleDateString(); 
-      const entryRef = db.collection('journal_entries');
+      const entryRef = collection(db, 'users', user.uid, 'journal_entries');
+      console.log('pressed check in');
 
-      await entryRef.add({
+      entryRef.add({
         date: todayDate,
         entry: dailyEntry,
         sleep_mins: dailySleepMin,
