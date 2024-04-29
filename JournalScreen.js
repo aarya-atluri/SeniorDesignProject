@@ -15,6 +15,7 @@ const JournalScreen = ({route}) => {
   const[dailySleep, setSleep] = useState('')
   const[activityHr, setExerciseHour] = useState(0);
   const[activityMins, setExerciseMin] = useState(0);
+  const[dailyExercise, setExercise] = useState('');
   const[dailyEntry, setDiary] = useState('')
   const[dailyWater, setWater] = useState('')
   const[dailyCaffeine, setCaffeine] = useState('')
@@ -41,7 +42,7 @@ const JournalScreen = ({route}) => {
   const onExerciseChangeHandler = (text) => {
     const [activityhr, activitymin] = text.split(':');
   
-    setSleep(text);
+    setExercise(text);
     setExerciseHour(parseInt(activityhr, 10)); 
     setExerciseMin(parseInt(activitymin, 10));
   };
