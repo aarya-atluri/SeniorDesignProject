@@ -6,7 +6,7 @@ import { useFonts } from 'expo-font';
 import ImagePicker from 'react-native-image-picker';
 import { useNavigation } from '@react-navigation/native';
 import {auth, db} from './Firebase/firebaseConfig'
-import {doc, getDoc, collection} from 'firebase/firestore'
+import {doc, getDoc, collection, Timestamp, add} from 'firebase/firestore'
 
 
 const JournalScreen = ({route}) => {
@@ -76,11 +76,12 @@ const JournalScreen = ({route}) => {
     try {
       const user = auth.currentUser;
       const todayDate = new Date().toLocaleDateString(); 
-      const entryRef = collection(db, 'users', user.uid, 'journal_entries');
+      const entryRef = collection(db, 'users', auth.currentUser?.uid, 'journal_entries');
       console.log('pressed check in');
 
+      let currentDate = Timestamp.fromDate(new Date(todayDate));
       entryRef.add({
-        date: todayDate,
+        date: currentDate,
         entry: dailyEntry,
         sleep_mins: dailySleepMin,
         sleep_hours: dailySleepHour,
@@ -103,34 +104,34 @@ return (
     <View style={styles.container}>
       <Text style={styles.sectionTitle}>How Are You Feeling?</Text>
       <View style={styles.sameRow}>
-        <TouchableOpacity onPress ={() => onImageHandler(1)}>
+        <TouchableOpacity onPress ={() => onImageHandler("excited")}>
         <Image
           style={styles.image}
           source={require('./assets/images/excited.jpg')} // Change the path to your image
         />
         </TouchableOpacity>
 
-        <TouchableOpacity onPress ={() => onImageHandler(2)}>
+        <TouchableOpacity onPress ={() => onImageHandler("happy")}>
         <Image
           style={styles.image}
           source={require('./assets/images/happy.jpg')} // Change the path to your image
         />
         </TouchableOpacity>
 
-        <TouchableOpacity onPress ={() => onImageHandler(3)}>
+        <TouchableOpacity onPress ={() => onImageHandler("meh")}>
         <Image
           style={styles.image}
           source={require('./assets/images/meh.jpg')} // Change the path to your image
         />
         </TouchableOpacity>
 
-        <TouchableOpacity onPress ={() => onImageHandler(4)}>
+        <TouchableOpacity onPress ={() => onImageHandler("sad")}>
         <Image
           style={styles.image}
           source={require('./assets/images/sad.jpg')} // Change the path to your image
         />
         </TouchableOpacity>
-        <TouchableOpacity onPress ={() => onImageHandler(5)}> 
+        <TouchableOpacity onPress ={() => onImageHandler("dead")}> 
         <Image
           style={styles.image}
           source={require('./assets/images/dead.jpg')} // Change the path to your image

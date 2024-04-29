@@ -25,8 +25,8 @@ const Stack = createStackNavigator();
 
 const JournalStackNavigator = () => (
   <Stack.Navigator>
-    <Stack.Screen name="Journal" component={JournalScreen} />
     <Stack.Screen name="Calendar" component={CalendarScreen} />
+    <Stack.Screen name="Journal" component={JournalScreen} />
     <Stack.Screen name = "SpecificEntry" component= {SpecificEntry} />
   </Stack.Navigator>
 );
