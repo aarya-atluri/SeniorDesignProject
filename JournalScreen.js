@@ -16,8 +16,8 @@ const JournalScreen = ({route}) => {
   const[activityHr, setExerciseHour] = useState(0);
   const[activityMins, setExerciseMin] = useState(0);
   const[dailyEntry, setDiary] = useState('')
-  const[dailyWater, setWater] = useState(0)
-  const[dailyCaffeine, setCaffeine] = useState(0)
+  const[dailyWater, setWater] = useState('')
+  const[dailyCaffeine, setCaffeine] = useState('')
   const [selectedMood, setMood] = useState(null);
   
   const navigation = useNavigation();
@@ -41,17 +41,20 @@ const JournalScreen = ({route}) => {
   const onExerciseChangeHandler = (text) => {
     const [activityhr, activitymin] = text.split(':');
   
-    setSleep(text);
+    setExercise(text);
     setExerciseHour(parseInt(activityhr, 10)); 
     setExerciseMin(parseInt(activitymin, 10));
   };
 
   const onWaterChangeHandler = (text) => {
-    setWater(parseInt(text,10));
+    const waterValue = parseInt(text, 10);
+    // Update the state with the parsed integer value
+    setWater(waterValue);
   };
 
   const onCaffeineChangeHandler = (text) => {
-    setCaffeine(parseInt(text,10));
+    const caffeineValue = (parseInt(text,10));
+    setCaffeine(caffeineValue);
   };
 
   const getImageUrl = (moodId) => {
