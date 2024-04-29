@@ -54,6 +54,24 @@ const JournalScreen = ({route}) => {
     setCaffeine(text);
   };
 
+  const getImageUrl = (moodId) => {
+    switch (moodId) {
+      case 1:
+        return './assets/images/excited.jpg';
+      case 2:
+        return './assets/images/happy.jpg';
+      case 3:
+        return './assets/images/meh.jpg';
+      case 4:
+        return './assets/images/sad.jpg';
+      case 5:
+        return './assets/images/dead.jpg';
+      default:
+        return null;
+    }
+  };
+  
+
   const onPressHandler = async () => {
     try {
       const user = auth.currentUser;
